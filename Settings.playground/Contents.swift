@@ -8,7 +8,7 @@ protocol SettingsOptions {
     var defaultValue : String { get }
 }
 
-class EnumSettingsOptions<T> : SettingsOptions where T : RawRepresentable, T.RawValue == String {
+class EnumSettingsOptions<T:Hashable> : SettingsOptions where T : RawRepresentable, T.RawValue == String {
     
     private let defaultVal : T
     init(defaultValue:T) {
@@ -20,7 +20,7 @@ class EnumSettingsOptions<T> : SettingsOptions where T : RawRepresentable, T.Raw
     }
     
     var options : [String] {
-        return Array(iterateEnum(Test.self)).map { $0.rawValue }
+        return Array(iterateEnum(T.self)).map { $0.rawValue }
     }
 }
 
@@ -50,15 +50,15 @@ class SettingsTableCell : UITableViewCell {
         return "SettingsTableCell"
     }
     
-}
-
-/*extension RawRepresentable : SettingsOptions where RawValue == String {
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        accessoryType = .none
+        accessoryView = nil
+        textLabel?.text = nil
+        detailTextLabel?.text = nil
+    }
     
-}*/
-
-//protocol SettingOptionType : RawRepresentable where RawRepresentable.RawValue == String {
-    //associatedtype SettingIdentifier: RawRepresentable
-//}
+}
 
 enum Setting {
     
@@ -70,25 +70,90 @@ enum Setting {
     
 }
 
+protocol SettingsDataSource {
+    
+    func bool(forKey:String) -> Bool
+    func float(forKey:String) -> Float
+    func integer(forKey:String) -> Int
+    func string(forKey:String) -> String?
+    func hasValue(forKey:String) -> Bool
+}
+
+
+extension UserDefaults : SettingsDataSource {
+    func hasValue(forKey key: String) -> Bool {
+        guard let _ = value(forKey: key) else {
+            return false
+        }
+        return true
+    }
+
+}
+
 extension Setting {
-    func configure(cell:UITableViewCell) {
+    
+    fileprivate func bool(forKey key:String, dataSource:SettingsDataSource) -> Bool {
+        switch self {
+        case let .Toggle(_,_,defaultValue):
+            return dataSource.hasValue(forKey: key) ? dataSource.bool(forKey: key) : defaultValue
+        default:
+            fatalError()
+        }
+    }
+    fileprivate func float(forKey key:String, dataSource:SettingsDataSource) -> Float {
+        switch self {
+        case let .Slider(_,_,_,_,defaultValue):
+            return dataSource.hasValue(forKey: key) ? dataSource.float(forKey: key) : defaultValue
+        default:
+            fatalError()
+        }
+
+    }
+    fileprivate func integer(forKey key:String, dataSource:SettingsDataSource) -> Int {
+        return 3
+    }
+    fileprivate func string(forKey key:String, dataSource:SettingsDataSource) -> String? {
+        switch self {
+        case let .Text(_,_,defaultValue):
+            return dataSource.hasValue(forKey: key) ? dataSource.string(forKey: key) : defaultValue
+
+        case let .Select(_, id, settingsOptions):
+            if dataSource.hasValue(forKey: key) {
+                let proposedValue = dataSource.string(forKey: key)!
+                if settingsOptions.options.contains(proposedValue) {
+                    return proposedValue
+                } else {
+                    return settingsOptions.defaultValue
+                }
+            } else {
+                return settingsOptions.defaultValue
+            }
+
+        default:
+            fatalError()
+        }
+
+    }
+    
+    func configure(cell:UITableViewCell, dataSource:SettingsDataSource) {
         switch self {
         case .Group:
             fatalError()
             
-        case let .Toggle(label,_,defaultValue):
+        case let .Toggle(label,key,_):
             cell.textLabel?.text = label
+            cell.detailTextLabel?.text = nil
             let s = UISwitch()
-            s.isOn = defaultValue
+            s.isOn = bool(forKey: key, dataSource: dataSource)
             cell.accessoryView = s
             
-        case let .Text(label,_,defaultValue):
+        case let .Text(label,key,_):
             cell.textLabel?.text = label
-            cell.detailTextLabel?.text = defaultValue
+            cell.detailTextLabel?.text = string(forKey: key, dataSource: dataSource)
             
-        case let .Select(label: label, id: _, options: options):
+        case let .Select(label, key, _):
             cell.textLabel?.text = label
-            cell.detailTextLabel?.text = options.defaultValue
+            cell.detailTextLabel?.text = string(forKey: key, dataSource: dataSource)
             cell.accessoryType = .disclosureIndicator
             
         case .Slider:
@@ -162,7 +227,7 @@ class SettingsViewController: SettingsBaseViewController {
     weak var delegate : SettingsViewControllerDelegate?
     
     private var items : [Setting] = []
-    private var defaultsStore : UserDefaults
+    fileprivate var defaultsStore : UserDefaults
     
     init(settings:[Setting], delegate:SettingsViewControllerDelegate) {
         self.defaultsStore = UserDefaults.standard
@@ -237,15 +302,18 @@ extension SettingsViewController : UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableCell.reuseIdentifier, for: indexPath) as! SettingsTableCell
+        
         let item = setting(for: indexPath.section)
         
         switch item {
         case let .Group(_, groupSettings):
-            groupSettings[indexPath.row].configure(cell: cell)
-        case let .Select(label: label, id: id, options: options):
+            groupSettings[indexPath.row].configure(cell: cell, dataSource:self.defaultsStore)
+        case let .Select(label, key, options):
             let options = options.options
-            cell.textLabel?.text = options[indexPath.row]
-            cell.accessoryType = .checkmark
+            let valueToDisplay = options[indexPath.row]
+            cell.textLabel?.text = valueToDisplay
+            let currentValue = item.string(forKey: key, dataSource: self.defaultsStore)
+            cell.accessoryType = (valueToDisplay == currentValue) ? .checkmark : .none
         default:
             break
         }
@@ -267,8 +335,9 @@ enum Speed : String {
     case Fastest
 }
 
-let whoOptions = EnumSettingsOptions<Test>(defaultValue:.Lady)
 let speedOptions = EnumSettingsOptions<Speed>(defaultValue:.Fastest)
+let whoOptions = EnumSettingsOptions<Test>(defaultValue:.Lady)
+
 
 let settings = [
     Setting.Group(title:"General", children:[
@@ -293,10 +362,14 @@ class TheDelegate : SettingsViewControllerDelegate {
 
 var theDelegate = TheDelegate()
 
+var defaults = UserDefaults.standard
+defaults.set("Whhooppeee", forKey: "general.baz")
+defaults.synchronize()
+
 var ctrl = SettingsViewController(settings:settings, delegate:theDelegate)
 let nav = UINavigationController(rootViewController: ctrl)
-nav.title = "Setting Example"
 nav.view.frame = CGRect(x: 0, y: 0, width: 320, height: 480)
+ctrl.title = "Settings Example"
 ctrl.view.frame = nav.view.frame
 ctrl.tableView.frame = ctrl.view.frame
 PlaygroundPage.current.liveView = nav.view
