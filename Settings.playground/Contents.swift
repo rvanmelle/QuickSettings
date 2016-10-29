@@ -209,7 +209,7 @@ extension SettingsViewController : UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        return "This is a great long string, and I'm not sure how it will be displayed"
+        return nil
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
