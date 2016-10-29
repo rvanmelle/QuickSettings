@@ -121,6 +121,11 @@ protocol SettingsOptionsViewControllerDelegate : class {
 
 class SettingsOptionsViewController: SettingsBaseViewController {
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.tableView!.dataSource = self
+    }
+    
 }
 
 extension SettingsOptionsViewController : UITableViewDelegate {
@@ -140,12 +145,11 @@ extension SettingsOptionsViewController : UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableCell.reuseIdentifier, for: indexPath) as! SettingsTableCell
+        cell.textLabel?.text = "Hello"
+        cell.accessoryType = .checkmark
         return cell
     }
-    
 }
-
-
 
 // Main Settings
 
@@ -183,13 +187,18 @@ class SettingsViewController: SettingsBaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView!.dataSource = self
+        self.tableView!.delegate = self
     }
     
 }
 
 extension SettingsViewController : UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        tableView.deselectRow(at: indexPath, animated: true)
+        let optionsVC = SettingsOptionsViewController()
+        optionsVC.view.frame = view.frame
+        optionsVC.tableView.frame = view.frame
+        navigationController?.pushViewController(optionsVC, animated: true)
     }
 }
 
@@ -203,6 +212,8 @@ extension SettingsViewController : UITableViewDataSource {
         switch item {
         case let .Group(name, _):
             return name
+        case let .Select(label: label, _, _):
+            return label
         default:
             return nil
         }
@@ -217,6 +228,8 @@ extension SettingsViewController : UITableViewDataSource {
         switch item {
         case let .Group(_, groupSettings):
             return groupSettings.count
+        case let .Select(label: label, id: id, options: options):
+            return options.options.count
         default:
             return 1
         }
@@ -229,6 +242,10 @@ extension SettingsViewController : UITableViewDataSource {
         switch item {
         case let .Group(_, groupSettings):
             groupSettings[indexPath.row].configure(cell: cell)
+        case let .Select(label: label, id: id, options: options):
+            let options = options.options
+            cell.textLabel?.text = options[indexPath.row]
+            cell.accessoryType = .checkmark
         default:
             break
         }
@@ -244,15 +261,23 @@ enum Test : String {
     case Tramp
 }
 
-let o = EnumSettingsOptions<Test>(defaultValue:.Lady)
+enum Speed : String {
+    case Fast
+    case Faster
+    case Fastest
+}
+
+let whoOptions = EnumSettingsOptions<Test>(defaultValue:.Lady)
+let speedOptions = EnumSettingsOptions<Speed>(defaultValue:.Fastest)
 
 let settings = [
     Setting.Group(title:"General", children:[
         Setting.Toggle(label:"Foo", id:"general.foo", default:true),
         Setting.Toggle(label:"Bar", id:"general.bar", default:false),
-        Setting.Select(label:"Bar2", id:"general.bar2", options:o),
+        Setting.Select(label:"Bar2", id:"general.bar2", options:whoOptions),
         Setting.Text(label:"Baz", id:"general.baz", default:"Saskatoon"),
     ]),
+    Setting.Select(label:"How fast?", id:"speed", options:speedOptions),
     Setting.Group(title:"Extra", children:[
         Setting.Toggle(label:"Foo", id:"extra.foo", default:false),
         Setting.Toggle(label:"Bar", id:"extra.bar", default:true),
@@ -267,8 +292,12 @@ class TheDelegate : SettingsViewControllerDelegate {
 }
 
 var theDelegate = TheDelegate()
+
 var ctrl = SettingsViewController(settings:settings, delegate:theDelegate)
-ctrl.view.frame = CGRect(x: 0, y: 0, width: 320, height: 480)
+let nav = UINavigationController(rootViewController: ctrl)
+nav.title = "Setting Example"
+nav.view.frame = CGRect(x: 0, y: 0, width: 320, height: 480)
+ctrl.view.frame = nav.view.frame
 ctrl.tableView.frame = ctrl.view.frame
-PlaygroundPage.current.liveView = ctrl.view
+PlaygroundPage.current.liveView = nav.view
 
