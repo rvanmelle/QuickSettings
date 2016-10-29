@@ -34,4 +34,4 @@ var ctrl = SettingsViewController(settings:settings, delegate:theDelegate)
 
 ```
 
-![Alt text](/screenshots/example1.png?raw=true "Example 1")
+![Alt text](/screenshots/example1.png?raw=true "Example 1" | width=300)
