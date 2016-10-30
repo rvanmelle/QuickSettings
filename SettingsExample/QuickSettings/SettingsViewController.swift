@@ -31,7 +31,7 @@ public protocol SettingsViewControllerDelegate : class {
     func settingsViewController(vc:SettingsViewController, didUpdateSetting id:String)
 }
 
-public class SettingsViewController: SettingsBaseViewController, SettingsOptionsViewControllerDelegate {
+public class SettingsViewController: SettingsBaseViewController {
     
     weak var delegate : SettingsViewControllerDelegate?
     
@@ -77,10 +77,21 @@ public class SettingsViewController: SettingsBaseViewController, SettingsOptions
     
 }
 
+extension SettingsViewController : SettingsOptionsViewControllerDelegate {
+    
+    func settingsOptionsViewController(vc: SettingsOptionsViewController, didSelect option: String, for key: String) {
+        defaultsStore.set(option, forKey: key)
+        delegate?.settingsViewController(vc: self, didUpdateSetting: key)
+        tableView.reloadData()
+
+    }
+}
+
 extension SettingsViewController : UITableViewDelegate {
     
-    private func navigateToSelect(options:SettingsOptions, value:String) {
-        let optionsVC = SettingsOptionsViewController(options: options,  selected:value, delegate: self)
+    private func navigateToSelect(options:SettingsOptions, label:String, key:String, value:String) {
+        let optionsVC = SettingsOptionsViewController(options: options, key:key, selected:value, delegate: self)
+        optionsVC.title = label
         optionsVC.view.frame = view.frame
         optionsVC.tableView.frame = view.frame
         navigationController?.pushViewController(optionsVC, animated: true)
@@ -94,19 +105,22 @@ extension SettingsViewController : UITableViewDelegate {
         case let .Group(_, groupSettings):
             let subSetting = groupSettings[indexPath.row]
             switch subSetting {
-            case let .Select(_, key,options):
+            case let .Select(label,key,options):
                 let currentValue = subSetting.string(forKey: key, dataSource: self.defaultsStore)
-                navigateToSelect(options: options, value:currentValue!)
+                navigateToSelect(options: options, label:label, key:key, value:currentValue!)
             default:
                 break
             }
-        case .Select(_, _, _):
-            break
+
+        case let .Select(_, key, options):
+            let newValue = options.options[indexPath.row]
+            defaultsStore.set(newValue, forKey: key)
+            delegate?.settingsViewController(vc: self, didUpdateSetting: key)
+            tableView.reloadData()
+
         default:
             break
         }
-        
-        
     }
 }
 
@@ -136,7 +150,8 @@ extension SettingsViewController : UITableViewDataSource {
         switch item {
         case let .Group(_, groupSettings):
             return groupSettings.count
-        case let .Select(label: _, id: _, options: options):
+
+        case let .Select(_, id: _, options: options):
             return options.options.count
         default:
             return 1
@@ -172,6 +187,7 @@ extension SettingsViewController : UITableViewDataSource {
             cell.textLabel?.text = valueToDisplay
             let currentValue = item.string(forKey: key, dataSource: self.defaultsStore)
             cell.accessoryType = (valueToDisplay == currentValue) ? .checkmark : .none
+
         default:
             break
         }

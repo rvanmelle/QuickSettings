@@ -9,7 +9,7 @@
 import UIKit
 import QuickSettings
 
-enum Test : String {
+enum Dogs : String {
     case Lady
     case Tramp
 }
@@ -21,22 +21,23 @@ enum Speed : String {
 }
 
 let speedOptions = EnumSettingsOptions<Speed>(defaultValue:.Fastest)
-let whoOptions = EnumSettingsOptions<Test>(defaultValue:.Lady)
-
+let dogOptions = EnumSettingsOptions<Dogs>(defaultValue:.Lady)
 
 let settings = [
     Setting.Group(title:"General", children:[
         Setting.Toggle(label:"Foo", id:"general.foo", default:true),
         Setting.Toggle(label:"Bar", id:"general.bar", default:false),
-        Setting.Select(label:"Bar2", id:"general.bar2", options:whoOptions),
+        Setting.Select(label:"Bar2", id:"general.bar2", options:dogOptions),
         Setting.Text(label:"Baz", id:"general.baz", default:"Saskatoon"),
-        ]),
+    ]),
+    
     Setting.Select(label:"How fast?", id:"speed", options:speedOptions),
+    
     Setting.Group(title:"Extra", children:[
         Setting.Toggle(label:"Foo", id:"extra.foo", default:false),
         Setting.Toggle(label:"Bar", id:"extra.bar", default:true),
         Setting.Text(label:"Baz", id:"extra.baz", default:"TomTom"),
-        ])
+    ])
 ]
 
 

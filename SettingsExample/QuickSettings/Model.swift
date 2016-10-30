@@ -29,7 +29,7 @@ public class EnumSettingsOptions<T:Hashable> : SettingsOptions where T : RawRepr
     }
 }
 
-func iterateEnum<T: Hashable>(_: T.Type) -> AnyIterator<T> {
+private func iterateEnum<T: Hashable>(_: T.Type) -> AnyIterator<T> {
     var i = 0
     return AnyIterator {
         let next = withUnsafePointer(to: &i) {
@@ -104,10 +104,8 @@ protocol SettingsDataSource {
 extension UserDefaults : SettingsDataSource {
     func hasValue(forKey key: String) -> Bool {
         if let _ = value(forKey: key) {
-            print("hasValue? \(key) true")
             return true
         } else {
-            print("hasValue? \(key) false")
             return false
         }
     }
@@ -134,8 +132,9 @@ extension Setting {
         
     }
     fileprivate func integer(forKey key:String, dataSource:SettingsDataSource) -> Int {
-        return 3
+        fatalError()
     }
+    
     internal func string(forKey key:String, dataSource:SettingsDataSource) -> String? {
         switch self {
         case let .Text(_,_,defaultValue):

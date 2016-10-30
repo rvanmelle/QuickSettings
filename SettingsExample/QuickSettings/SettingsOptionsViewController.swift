@@ -10,17 +10,21 @@ import Foundation
 
 // Settings Options
 protocol SettingsOptionsViewControllerDelegate : class {
+    func settingsOptionsViewController(vc:SettingsOptionsViewController, didSelect option:String, for key:String)
 }
 
 class SettingsOptionsViewController: SettingsBaseViewController {
     
     weak var delegate : SettingsOptionsViewControllerDelegate?
+    
     fileprivate var options : SettingsOptions
     fileprivate var selected : String
+    fileprivate var optionKey : String
     
-    init(options:SettingsOptions, selected:String, delegate:SettingsOptionsViewControllerDelegate) {
+    init(options:SettingsOptions, key:String, selected:String, delegate:SettingsOptionsViewControllerDelegate) {
         self.selected = selected
         self.options = options
+        self.optionKey = key
         super.init(nibName: nil, bundle: nil)
         self.delegate = delegate
         
@@ -42,6 +46,7 @@ extension SettingsOptionsViewController : UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath)
         selected = cell!.textLabel!.text!
+        delegate?.settingsOptionsViewController(vc: self, didSelect: selected, for: optionKey)
         tableView.reloadData()
     }
 }
@@ -61,6 +66,7 @@ extension SettingsOptionsViewController : UITableViewDataSource {
         let val = options.options[indexPath.row]
         cell.textLabel?.text = val
         cell.accessoryType = val == selected ? .checkmark : .none
+        
         return cell
     }
 }
