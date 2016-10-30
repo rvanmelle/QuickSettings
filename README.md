@@ -1,3 +1,5 @@
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+
 # QuickSettings
 
 The goal of this project is to build lightweight in-app settings screen quickly and easily. It is written in Swift3. Settings are persisted via UserDefaults.standard.
