@@ -68,6 +68,42 @@ enum Setting {
     case Select(label:String, id:String, options:SettingsOptions)
     indirect case Group(title:String, children:[Setting])
     
+    var uniqueId : String? {
+        switch self {
+        case let .Toggle(_, id, _):
+            return id
+        case let .Slider(_,id,_,_,_):
+            return id
+        case let .Text(_,id,_):
+            return id
+        case let .Select(_,id,_):
+            return id
+        default:
+            return nil
+        }
+    }
+    
+    func settingForId(target:String) -> Setting? {
+        switch self {
+        case let .Toggle(_, id, _):
+            return id == target ? self : nil
+        case let .Slider(_,id,_,_,_):
+            return id == target ? self : nil
+        case let .Text(_,id,_):
+            return id == target ? self : nil
+        case let .Select(_,id,_):
+            return id == target ? self : nil
+        case let .Group(_, children: children):
+            for c in children {
+                if let s = c.settingForId(target: target) {
+                    return s
+                }
+            }
+            return nil
+        }
+
+    }
+    
 }
 
 protocol SettingsDataSource {
@@ -77,17 +113,24 @@ protocol SettingsDataSource {
     func integer(forKey:String) -> Int
     func string(forKey:String) -> String?
     func hasValue(forKey:String) -> Bool
+    
+    func set(_ value:Bool, forKey:String)
+    func set(_ value:Float, forKey:String)
+    func set(_ value:Any?, forKey:String)
 }
 
 
 extension UserDefaults : SettingsDataSource {
     func hasValue(forKey key: String) -> Bool {
-        guard let _ = value(forKey: key) else {
+        if let _ = value(forKey: key) {
+            print("hasValue? \(key) true")
+            return true
+        } else {
+            print("hasValue? \(key) false")
             return false
         }
-        return true
     }
-
+    
 }
 
 extension Setting {
@@ -134,6 +177,8 @@ extension Setting {
         }
 
     }
+    
+    
     
     func configure(cell:UITableViewCell, dataSource:SettingsDataSource) {
         switch self {
@@ -186,32 +231,53 @@ protocol SettingsOptionsViewControllerDelegate : class {
 
 class SettingsOptionsViewController: SettingsBaseViewController {
     
+    weak var delegate : SettingsOptionsViewControllerDelegate?
+    fileprivate var options : SettingsOptions
+    fileprivate var selected : String
+    
+    init(options:SettingsOptions, selected:String, delegate:SettingsOptionsViewControllerDelegate) {
+        self.selected = selected
+        self.options = options
+        super.init(nibName: nil, bundle: nil)
+        self.delegate = delegate
+
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError()
+    }
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView!.dataSource = self
+        self.tableView!.delegate = self
     }
     
 }
 
 extension SettingsOptionsViewController : UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        let cell = tableView.cellForRow(at: indexPath)
+        selected = cell!.textLabel!.text!
+        tableView.reloadData()
     }
 }
 
 extension SettingsOptionsViewController : UITableViewDataSource {
+    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return options.options.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableCell.reuseIdentifier, for: indexPath) as! SettingsTableCell
-        cell.textLabel?.text = "Hello"
-        cell.accessoryType = .checkmark
+        let val = options.options[indexPath.row]
+        cell.textLabel?.text = val
+        cell.accessoryType = val == selected ? .checkmark : .none
         return cell
     }
 }
@@ -222,7 +288,7 @@ protocol SettingsViewControllerDelegate : class {
     func settingsViewController(vc:SettingsViewController, didUpdateSetting id:String)
 }
 
-class SettingsViewController: SettingsBaseViewController {
+class SettingsViewController: SettingsBaseViewController, SettingsOptionsViewControllerDelegate {
     
     weak var delegate : SettingsViewControllerDelegate?
     
@@ -237,17 +303,28 @@ class SettingsViewController: SettingsBaseViewController {
         items = settings
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError()
+    }
+    
     func setting(for section:Int) -> Setting {
         return items[section]
+    }
+    
+    func setting(for id:String) -> Setting? {
+        for s in items {
+            if let result = s.settingForId(target: id) {
+                return result
+            }
+        }
+        return nil
     }
     
     var numberOfGroups : Int {
         return items.count
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError()
-    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -258,12 +335,35 @@ class SettingsViewController: SettingsBaseViewController {
 }
 
 extension SettingsViewController : UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let optionsVC = SettingsOptionsViewController()
+    
+    private func navigateToSelect(options:SettingsOptions, value:String) {
+        let optionsVC = SettingsOptionsViewController(options: options,  selected:value, delegate: self)
         optionsVC.view.frame = view.frame
         optionsVC.tableView.frame = view.frame
         navigationController?.pushViewController(optionsVC, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let item = setting(for: indexPath.section)
+        switch item {
+        case let .Group(_, groupSettings):
+            let subSetting = groupSettings[indexPath.row]
+            switch subSetting {
+            case let .Select(_, key,options):
+                let currentValue = subSetting.string(forKey: key, dataSource: self.defaultsStore)
+                navigateToSelect(options: options, value:currentValue!)
+            default:
+                break
+            }
+        case let .Select(label: label, _, options):
+            break
+        default:
+            break
+        }
+
+        
     }
 }
 
@@ -300,14 +400,29 @@ extension SettingsViewController : UITableViewDataSource {
         }
     }
     
+    @objc
+    func switchValueChanged(s:UISwitch) {
+        if let id = s.restorationIdentifier, let setting = setting(for: id) {
+            defaultsStore.set(s.isOn, forKey: id)
+            delegate?.settingsViewController(vc: self, didUpdateSetting: id)
+        }
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableCell.reuseIdentifier, for: indexPath) as! SettingsTableCell
         
         let item = setting(for: indexPath.section)
         
         switch item {
+
         case let .Group(_, groupSettings):
-            groupSettings[indexPath.row].configure(cell: cell, dataSource:self.defaultsStore)
+            let subSetting = groupSettings[indexPath.row]
+            subSetting.configure(cell: cell, dataSource:self.defaultsStore)
+            if let s = cell.accessoryView as? UISwitch {
+                s.restorationIdentifier = subSetting.uniqueId
+                s.addTarget(self, action: #selector(switchValueChanged(s:)), for: .valueChanged)
+            }
+
         case let .Select(label, key, options):
             let options = options.options
             let valueToDisplay = options[indexPath.row]
@@ -350,7 +465,7 @@ let settings = [
     Setting.Group(title:"Extra", children:[
         Setting.Toggle(label:"Foo", id:"extra.foo", default:false),
         Setting.Toggle(label:"Bar", id:"extra.bar", default:true),
-        Setting.Text(label:"Baz", id:"extra.baz", default:"Tom"),
+        Setting.Text(label:"Baz", id:"extra.baz", default:"TomTom"),
     ])
 ]
 
@@ -364,7 +479,11 @@ var theDelegate = TheDelegate()
 
 var defaults = UserDefaults.standard
 defaults.set("Whhooppeee", forKey: "general.baz")
+defaults.set("nice", forKey: "extra.baz")
+defaults.set(true, forKey: "extra.foo")
 defaults.synchronize()
+
+var testit = defaults.value(forKey: "general.baz")
 
 var ctrl = SettingsViewController(settings:settings, delegate:theDelegate)
 let nav = UINavigationController(rootViewController: ctrl)
