@@ -41,6 +41,26 @@ private func iterateEnum<T: Hashable>(_: T.Type) -> AnyIterator<T> {
     }
 }
 
+public func quickToggle(label:String, id:String, defaultValue:Bool) -> Setting {
+    return Setting.Toggle(label: label, id: id, default: defaultValue)
+}
+
+public func quickSlider(label:String, id:String, min:Float, max:Float, defaultValue:Float) -> Setting {
+    return Setting.Slider(label: label, id: id, min: min, max: max, default: defaultValue)
+}
+
+public func quickText(label:String, id:String, defaultValue:String? = nil) -> Setting {
+    return Setting.Text(label: label, id: id, default: defaultValue)
+}
+
+public func quickSelect(label:String, id:String, options:SettingsOptions) -> Setting {
+    return Setting.Select(label: label, id: id, options: options)
+}
+
+public func quickGroup(title:String, children:[Setting], footer:String?=nil) -> Setting {
+    return Setting.Group(title: title, children: children)
+}
+
 public enum Setting {
     
     case Toggle(label:String, id:String, default:Bool)

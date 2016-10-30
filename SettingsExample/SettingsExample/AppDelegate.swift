@@ -24,19 +24,19 @@ let speedOptions = EnumSettingsOptions<Speed>(defaultValue:.Fastest)
 let dogOptions = EnumSettingsOptions<Dogs>(defaultValue:.Lady)
 
 let settings = [
-    Setting.Group(title:"General", children:[
-        Setting.Toggle(label:"Foo", id:"general.foo", default:true),
-        Setting.Toggle(label:"Bar", id:"general.bar", default:false),
-        Setting.Select(label:"Bar2", id:"general.bar2", options:dogOptions),
-        Setting.Text(label:"Baz", id:"general.baz", default:"Saskatoon"),
+    quickGroup(title:"General", children:[
+        quickToggle(label:"Foo", id:"general.foo", defaultValue:true),
+        quickToggle(label:"Bar", id:"general.bar", defaultValue:false),
+        quickSelect(label:"Bar2", id:"general.bar2", options:dogOptions),
+        quickText(label:"Baz", id:"general.baz", defaultValue:"Saskatoon"),
     ]),
     
-    Setting.Select(label:"How fast?", id:"speed", options:speedOptions),
+    quickSelect(label:"How fast?", id:"speed", options:speedOptions),
     
-    Setting.Group(title:"Extra", children:[
-        Setting.Toggle(label:"Foo", id:"extra.foo", default:false),
-        Setting.Toggle(label:"Bar", id:"extra.bar", default:true),
-        Setting.Text(label:"Baz", id:"extra.baz", default:"TomTom"),
+    quickGroup(title:"Extra", children:[
+        quickToggle(label:"Foo", id:"extra.foo", defaultValue:false),
+        quickToggle(label:"Bar", id:"extra.bar", defaultValue:true),
+        quickText(label:"Baz", id:"extra.baz", defaultValue:"TomTom"),
     ])
 ]
 
