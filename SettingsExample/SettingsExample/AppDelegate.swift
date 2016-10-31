@@ -31,7 +31,11 @@ let settings = [
         quickText(label:"Baz", id:"general.baz", defaultValue:"Saskatoon"),
     ]),
     
+    quickText(label:"Info", id:"general.info", defaultValue:"Swing"),
+    
     quickSelect(label:"How fast?", id:"speed", options:speedOptions),
+    
+    quickToggle(label:"Should I?", id:"general.shouldi", defaultValue:true),
     
     quickGroup(title:"Extra", children:[
         quickToggle(label:"Foo", id:"extra.foo", defaultValue:false),
@@ -49,7 +53,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
-        let vc = SettingsViewController(settings:settings, delegate:self)
+        let dataStore = UserDefaults.standard
+        quickInit(settings: settings, datastore: dataStore)
+        let vc = SettingsViewController(settings:settings, delegate:self, dataStore:dataStore)
         vc.title = "Settings Example"
         let nav = UINavigationController(rootViewController: vc)
         window?.rootViewController = nav

@@ -10,6 +10,8 @@ This is a work in progress and should not be used in production. If you find thi
 
 If you want some advanced, highly customizable, with validation, etc. you should use one of the many incredible open-source form options such as Eureka.
 
+This project *will not* generate a proper settings bundle that can be used for your proper app settings.
+
 ## Installation
 
 Install via carthage by adding to your Cartfile:
@@ -27,6 +29,7 @@ github "rvanmelle/QuickSettings"
 * section footers
 * custom UserDefaults
 * usage from storyboard
+* unit tests
 
 ## Usage
 
@@ -50,22 +53,34 @@ let speedOptions = EnumSettingsOptions<Speed>(defaultValue:.Fastest)
 let dogOptions = EnumSettingsOptions<Dogs>(defaultValue:.Lady)
 
 let settings = [
-    Setting.Group(title:"General", children:[
-        Setting.Toggle(label:"Foo", id:"general.foo", default:true),
-        Setting.Toggle(label:"Bar", id:"general.bar", default:false),
-        Setting.Select(label:"Bar2", id:"general.bar2", options:dogOptions),
-        Setting.Text(label:"Baz", id:"general.baz", default:"Saskatoon"),
+    quickGroup(title:"General", children:[
+        quickToggle(label:"Foo", id:"general.foo", defaultValue:true),
+        quickToggle(label:"Bar", id:"general.bar", defaultValue:false),
+        quickSelect(label:"Bar2", id:"general.bar2", options:dogOptions),
+        quickText(label:"Baz", id:"general.baz", defaultValue:"Saskatoon"),
     ]),
     
-    Setting.Select(label:"How fast?", id:"speed", options:speedOptions),
+    quickText(label:"Info", id:"general.info", defaultValue:"Swing"),
     
-    Setting.Group(title:"Extra", children:[
-        Setting.Toggle(label:"Foo", id:"extra.foo", default:false),
-        Setting.Toggle(label:"Bar", id:"extra.bar", default:true),
-        Setting.Text(label:"Baz", id:"extra.baz", default:"TomTom"),
+    quickSelect(label:"How fast?", id:"speed", options:speedOptions),
+    
+    quickToggle(label:"Should I?", id:"general.shouldi", defaultValue:true),
+    
+    quickGroup(title:"Extra", children:[
+        quickToggle(label:"Foo", id:"extra.foo", defaultValue:false),
+        quickToggle(label:"Bar", id:"extra.bar", defaultValue:true),
+        quickText(label:"Baz", id:"extra.baz", defaultValue:"TomTom"),
     ])
 ]
 
+```
+
+If you want to initialize your settings datastore with the declared default values OR reset all of your defaults back to defaults:
+
+```swift
+let dataStore = UserDefaults.standard
+quickInit(settings: settings, datastore: dataStore)
+quickReset(settings: settings, dataStore: dataStore)
 ```
 
 To use, simply declare a SettingsViewController, typically inside a navigation controller unless no hierarchy is required in your definition.

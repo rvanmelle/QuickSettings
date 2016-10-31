@@ -51,6 +51,26 @@ private func iterateEnum<T: Hashable>(_: T.Type) -> AnyIterator<T> {
     }
 }
 
+/**
+ Initializes the dataStore to fill in any missing values with defaults.
+ - parameter settings: the settings to be initialized
+ - parameter datastore: the conforming datastore to be initialized
+ - important: THIS WILL NOT OVERWRITE EXISTING VALUES
+ */
+public func quickInit(settings:[Setting], datastore : SettingsDataSource) {
+    for s in settings { s.initialize(datastore) }
+}
+
+/**
+ Initializes the dataStore to fill in any missing values with defaults.
+ - parameter settings: the settings to be initialized
+ - parameter datastore: the conforming datastore to be initialized
+ - Warning: DESTRUCTIVE OPERATION -- this will overwrite existing data with defaults
+ */
+public func quickReset(settings:[Setting], datastore : SettingsDataSource) {
+    for s in settings { s.reset(datastore) }
+}
+
 /** 
  Handy function to create a Toggle setting 
  - parameter label: the string to display to the user
@@ -116,7 +136,7 @@ public enum Setting {
     case Select(label:String, id:String, options:SettingsOptions)
     indirect case Group(title:String, children:[Setting])
     
-    var uniqueId : String? {
+    internal var uniqueId : String? {
         switch self {
         case let .Toggle(_, id, _):
             return id
@@ -131,7 +151,7 @@ public enum Setting {
         }
     }
     
-    func settingForId(target:String) -> Setting? {
+    internal func settingForId(target:String) -> Setting? {
         switch self {
         case let .Toggle(_, id, _):
             return id == target ? self : nil
@@ -221,6 +241,41 @@ extension Setting {
             fatalError()
         }
         
+    }
+    
+    internal func reset(_ dataSource:SettingsDataSource) {
+        switch self {
+        case let .Toggle(_, key, d):
+            dataSource.set(d, forKey: key)
+        case let .Slider(_,key,_,_,d):
+            dataSource.set(d, forKey: key)
+        case let .Text(_,key,d):
+            dataSource.set(d, forKey: key)
+        case let .Select(_,key,options):
+            dataSource.set(options.defaultValue, forKey: key)
+        case let .Group(_, children: children):
+            for c in children {
+                c.reset(dataSource)
+            }
+        }
+    }
+
+    
+    internal func initialize(_ dataSource:SettingsDataSource) {
+        switch self {
+        case let .Toggle(_, key, _):
+            if !dataSource.hasValue(forKey: key) { reset(dataSource) }
+        case let .Slider(_,key,_,_,_):
+            if !dataSource.hasValue(forKey: key) { reset(dataSource) }
+        case let .Text(_,key,_):
+            if !dataSource.hasValue(forKey: key) { reset(dataSource) }
+        case let .Select(_,key,_):
+            if !dataSource.hasValue(forKey: key) { reset(dataSource) }
+        case let .Group(_, children: children):
+            for c in children {
+                c.initialize(dataSource)
+            }
+        }
     }
     
     internal func configure(cell:UITableViewCell, dataSource:SettingsDataSource) {

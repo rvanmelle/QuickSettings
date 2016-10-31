@@ -97,8 +97,6 @@ extension SettingsViewController : UITableViewDelegate {
     private func navigateToSelect(options:SettingsOptions, label:String, key:String, value:String) {
         let optionsVC = SettingsOptionsViewController(options: options, key:key, selected:value, delegate: self)
         optionsVC.title = label
-        //optionsVC.view.frame = view.frame
-        //optionsVC.tableView.frame = view.frame
         navigationController?.pushViewController(optionsVC, animated: true)
     }
     
@@ -193,8 +191,8 @@ extension SettingsViewController : UITableViewDataSource {
             let currentValue = item.string(forKey: key, dataSource: self.defaultsStore)
             cell.accessoryType = (valueToDisplay == currentValue) ? .checkmark : .none
 
-        default:
-            break
+        case .Text, .Toggle, .Slider:
+            item.configure(cell: cell, dataSource: self.defaultsStore)
         }
         
         return cell
