@@ -8,11 +8,21 @@
 
 import Foundation
 
+/**
+ To create a list of option items, create something that conforms to the 
+ SettingsOptions protocol. This includes a list of the string options to be
+ displayed to the user and a defaultValue if nothing has been selected.
+ */
 public protocol SettingsOptions {
     var options : [String] { get }
     var defaultValue : String { get }
 }
 
+/**
+ This is a quick wrapper for an enum : String which makes it conform to
+ SettingsOptions. This allows a string enumeration to be easily used to display
+ a set of options to the user.
+*/
 public class EnumSettingsOptions<T:Hashable> : SettingsOptions where T : RawRepresentable, T.RawValue == String {
     
     private let defaultVal : T
@@ -41,22 +51,59 @@ private func iterateEnum<T: Hashable>(_: T.Type) -> AnyIterator<T> {
     }
 }
 
+/** 
+ Handy function to create a Toggle setting 
+ - parameter label: the string to display to the user
+ - parameter id: the key used to store/retrieve from the datastore
+ - parameter defaultValue: value to be used if none has been set
+ - returns: a Setting of type Setting.Toggle
+ */
 public func quickToggle(label:String, id:String, defaultValue:Bool) -> Setting {
     return Setting.Toggle(label: label, id: id, default: defaultValue)
 }
 
+/**
+ Handy function to create a Slider setting
+ - parameter label: the string to display to the user
+ - parameter id: the key used to store/retrieve from the datastore
+ - parameter min: minimum value for the slider
+ - parameter max: maximum value for the slider
+ - parameter defaultValue: value to be used if none has been set
+ - returns: a Setting of type Setting.Slider
+ */
 public func quickSlider(label:String, id:String, min:Float, max:Float, defaultValue:Float) -> Setting {
     return Setting.Slider(label: label, id: id, min: min, max: max, default: defaultValue)
 }
 
+/**
+ Handy function to create a Text setting
+ - parameter label: the string to display to the user
+ - parameter id: the key used to store/retrieve from the datastore
+ - parameter defaultValue: value to be used if none has been set
+ - returns: a Setting of type Setting.Text
+ */
 public func quickText(label:String, id:String, defaultValue:String? = nil) -> Setting {
     return Setting.Text(label: label, id: id, default: defaultValue)
 }
 
+/**
+ Handy function to create a Select setting
+ - parameter label: the string to display to the user
+ - parameter id: the key used to store/retrieve from the datastore
+ - parameter options: an object conforming to SettingsOptions
+ - returns: a Setting of type Setting.Select
+ */
 public func quickSelect(label:String, id:String, options:SettingsOptions) -> Setting {
     return Setting.Select(label: label, id: id, options: options)
 }
 
+/**
+ Handy function to create a Group setting
+ - parameter title: the title of the group to be displayed to the user
+ - parameter children: the list of Setting objects to be display in the group
+ - parameter footer: a description string displayed underneath the group
+ - returns: a Setting of type Setting.Group
+ */
 public func quickGroup(title:String, children:[Setting], footer:String?=nil) -> Setting {
     return Setting.Group(title: title, children: children)
 }
@@ -104,10 +151,9 @@ public enum Setting {
         }
         
     }
-    
 }
 
-protocol SettingsDataSource {
+public protocol SettingsDataSource {
     
     func bool(forKey:String) -> Bool
     func float(forKey:String) -> Float
@@ -122,14 +168,13 @@ protocol SettingsDataSource {
 
 
 extension UserDefaults : SettingsDataSource {
-    func hasValue(forKey key: String) -> Bool {
+    public func hasValue(forKey key: String) -> Bool {
         if let _ = value(forKey: key) {
             return true
         } else {
             return false
         }
     }
-    
 }
 
 extension Setting {
@@ -178,9 +223,7 @@ extension Setting {
         
     }
     
-    
-    
-    func configure(cell:UITableViewCell, dataSource:SettingsDataSource) {
+    internal func configure(cell:UITableViewCell, dataSource:SettingsDataSource) {
         switch self {
         case .Group:
             fatalError()

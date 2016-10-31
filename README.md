@@ -12,9 +12,11 @@ If you want some advanced, highly customizable, with validation, etc. you should
 
 ## Installation
 
-**Will be in Carthage**
+Install via carthage by adding to your Cartfile:
 
-Currently, you will need to install this manually. There is a framework definition SettingsExample workspace that shows how to use it.
+```
+github "rvanmelle/QuickSettings"
+```
 
 ## ToDo
 
@@ -24,6 +26,7 @@ Currently, you will need to install this manually. There is a framework definiti
 * inline group selection
 * section footers
 * custom UserDefaults
+* usage from storyboard
 
 ## Usage
 

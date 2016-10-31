@@ -36,13 +36,19 @@ public class SettingsViewController: SettingsBaseViewController {
     weak var delegate : SettingsViewControllerDelegate?
     
     private var items : [Setting] = []
-    fileprivate var defaultsStore : UserDefaults
+    fileprivate var defaultsStore : SettingsDataSource
     
-    public init(settings:[Setting], delegate:SettingsViewControllerDelegate) {
-        self.defaultsStore = UserDefaults.standard
+    /**
+     Create a new SettingsViewController
+     - parameter settings: The array of settings to be displayed at the root level
+     - parameter delegate: Delegate to be notified of changes
+     - parameter dataStore: The datastore where settings will be read/written to. Defaults = UserDefaults.standard
+     */
+    public init(settings:[Setting], delegate:SettingsViewControllerDelegate, dataStore:SettingsDataSource = UserDefaults.standard) {
+        self.defaultsStore = dataStore
         super.init(nibName: nil, bundle: nil)
         self.delegate = delegate
-        
+        self.title = "Settings"
         items = settings
     }
     
@@ -50,11 +56,11 @@ public class SettingsViewController: SettingsBaseViewController {
         fatalError()
     }
     
-    func setting(for section:Int) -> Setting {
+    fileprivate func setting(for section:Int) -> Setting {
         return items[section]
     }
     
-    func setting(for id:String) -> Setting? {
+    fileprivate func setting(for id:String) -> Setting? {
         for s in items {
             if let result = s.settingForId(target: id) {
                 return result
@@ -63,11 +69,9 @@ public class SettingsViewController: SettingsBaseViewController {
         return nil
     }
     
-    var numberOfGroups : Int {
+    fileprivate var numberOfGroups : Int {
         return items.count
     }
-    
-    
     
     override public func viewDidLoad() {
         super.viewDidLoad()
@@ -83,7 +87,6 @@ extension SettingsViewController : SettingsOptionsViewControllerDelegate {
         defaultsStore.set(option, forKey: key)
         delegate?.settingsViewController(vc: self, didUpdateSetting: key)
         tableView.reloadData()
-
     }
 }
 
@@ -159,7 +162,7 @@ extension SettingsViewController : UITableViewDataSource {
     }
     
     @objc
-    func switchValueChanged(s:UISwitch) {
+    fileprivate func switchValueChanged(s:UISwitch) {
         if let id = s.restorationIdentifier, let _ = setting(for: id) {
             defaultsStore.set(s.isOn, forKey: id)
             delegate?.settingsViewController(vc: self, didUpdateSetting: id)
