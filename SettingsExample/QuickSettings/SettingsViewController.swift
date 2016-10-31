@@ -17,9 +17,11 @@ public class SettingsBaseViewController: UIViewController {
     
     override public func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView = UITableView(frame: self.view.frame, style: .grouped)
-        self.tableView!.register(SettingsTableCell.self, forCellReuseIdentifier: SettingsTableCell.reuseIdentifier)
-        self.view.addSubview(self.tableView)
+        tableView = UITableView(frame: CGRect.zero, style: .grouped)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView!.register(SettingsTableCell.self, forCellReuseIdentifier: SettingsTableCell.reuseIdentifier)
+        view.addSubview(self.tableView)
+        view.pinItemFillAll(tableView)
     }
     
 }
@@ -95,8 +97,8 @@ extension SettingsViewController : UITableViewDelegate {
     private func navigateToSelect(options:SettingsOptions, label:String, key:String, value:String) {
         let optionsVC = SettingsOptionsViewController(options: options, key:key, selected:value, delegate: self)
         optionsVC.title = label
-        optionsVC.view.frame = view.frame
-        optionsVC.tableView.frame = view.frame
+        //optionsVC.view.frame = view.frame
+        //optionsVC.tableView.frame = view.frame
         navigationController?.pushViewController(optionsVC, animated: true)
     }
     

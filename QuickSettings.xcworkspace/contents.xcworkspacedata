@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:../TestPlayground.playground">
+      location = "group:Settings.playground">
    </FileRef>
    <FileRef
-      location = "self:">
+      location = "group:SettingsExample/SettingsExample.xcodeproj">
    </FileRef>
 </Workspace>

@@ -23,6 +23,7 @@
 		63B337301DC64A6700A2421E /* SettingsTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B3372F1DC64A6700A2421E /* SettingsTableCell.swift */; };
 		63B337331DC6541D00A2421E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63B337311DC6541D00A2421E /* Main.storyboard */; };
 		63B337351DC6547A00A2421E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B337341DC6547A00A2421E /* ViewController.swift */; };
+		63C327241DC8035A001E5542 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C327231DC8035A001E5542 /* UIView+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +102,7 @@
 		63B3372F1DC64A6700A2421E /* SettingsTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTableCell.swift; sourceTree = "<group>"; };
 		63B337321DC6541D00A2421E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		63B337341DC6547A00A2421E /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		63C327231DC8035A001E5542 /* UIView+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -208,6 +210,7 @@
 				63B3372D1DC64A4600A2421E /* SettingsOptionsViewController.swift */,
 				63B3372F1DC64A6700A2421E /* SettingsTableCell.swift */,
 				63B3372B1DC649FD00A2421E /* Model.swift */,
+				63C327221DC8033D001E5542 /* Extensions */,
 			);
 			path = QuickSettings;
 			sourceTree = "<group>";
@@ -219,6 +222,14 @@
 				63B3371C1DC6499E00A2421E /* Info.plist */,
 			);
 			path = QuickSettingsTests;
+			sourceTree = "<group>";
+		};
+		63C327221DC8033D001E5542 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				63C327231DC8035A001E5542 /* UIView+Extensions.swift */,
+			);
+			name = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -463,6 +474,7 @@
 			files = (
 				63B3372A1DC649E700A2421E /* SettingsViewController.swift in Sources */,
 				63B3372E1DC64A4600A2421E /* SettingsOptionsViewController.swift in Sources */,
+				63C327241DC8035A001E5542 /* UIView+Extensions.swift in Sources */,
 				63B3372C1DC649FD00A2421E /* Model.swift in Sources */,
 				63B337301DC64A6700A2421E /* SettingsTableCell.swift in Sources */,
 			);
@@ -799,6 +811,7 @@
 				63B336FF1DC6496A00A2421E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		63B337001DC6496A00A2421E /* Build configuration list for PBXNativeTarget "SettingsExampleTests" */ = {
 			isa = XCConfigurationList;
@@ -807,6 +820,7 @@
 				63B337021DC6496A00A2421E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		63B337031DC6496A00A2421E /* Build configuration list for PBXNativeTarget "SettingsExampleUITests" */ = {
 			isa = XCConfigurationList;
@@ -815,6 +829,7 @@
 				63B337051DC6496A00A2421E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		63B337221DC6499E00A2421E /* Build configuration list for PBXNativeTarget "QuickSettings" */ = {
 			isa = XCConfigurationList;
@@ -823,6 +838,7 @@
 				63B337241DC6499E00A2421E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		63B337261DC6499E00A2421E /* Build configuration list for PBXNativeTarget "QuickSettingsTests" */ = {
 			isa = XCConfigurationList;
@@ -831,6 +847,7 @@
 				63B337281DC6499E00A2421E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
