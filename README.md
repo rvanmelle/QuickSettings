@@ -112,3 +112,22 @@ extension AppDelegate : SettingsViewControllerDelegate {
 ```
 
 ![Alt text](/screenshots/example1.png?raw=true "Example 1" | width=300)
+
+## Using a Custom Data Store
+
+You can pass in any datastore that conforms to the SettingsDataSource protocol:
+
+```swift
+public protocol SettingsDataSource {
+    
+    func bool(forKey:String) -> Bool
+    func float(forKey:String) -> Float
+    func integer(forKey:String) -> Int
+    func string(forKey:String) -> String?
+    func hasValue(forKey:String) -> Bool
+    
+    func set(_ value:Bool, forKey:String)
+    func set(_ value:Float, forKey:String)
+    func set(_ value:Any?, forKey:String)
+}
+```
