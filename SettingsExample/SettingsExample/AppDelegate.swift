@@ -29,7 +29,7 @@ let settings = [
         quickInfo(label: "Bar Info", text: "this is what bar is"),
         quickSelect(label:"Bar2", id:"general.bar2", options:dogOptions),
         quickText(label:"Baz", id:"general.baz", defaultValue:"Saskatoon"),
-        ], footer:"This is a great section for adding lots of random settings that are not really necessary."),
+    ], footer:"This is a great section for adding lots of random settings that are not really necessary."),
     
     quickText(label:"Info", id:"general.info", defaultValue:"Swing"),
     
@@ -41,6 +41,11 @@ let settings = [
         quickToggle(label:"Foo", id:"extra.foo", defaultValue:false),
         quickToggle(label:"Bar", id:"extra.bar", defaultValue:true),
         quickText(label:"Baz", id:"extra.baz", defaultValue:"TomTom"),
+        
+        quickGroup(title:"SubGroup", children:[
+            quickToggle(label:"SubFoo", id:"extra.subfoo", defaultValue:false),
+        ])
+        
     ])
 ]
 

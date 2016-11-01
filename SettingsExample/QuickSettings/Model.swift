@@ -229,6 +229,15 @@ public struct GroupSetting {
         self.children = children
         self.footer = footer
     }
+    
+    internal func setting(for key:String) -> Setting? {
+        for c in children {
+            if let s = c.settingForId(target: key) {
+                return s
+            }
+        }
+        return nil
+    }
 }
 
 public struct SelectSetting {

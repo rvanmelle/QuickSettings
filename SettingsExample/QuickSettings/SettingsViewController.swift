@@ -61,15 +61,6 @@ public class SettingsViewController: SettingsBaseViewController {
         return root.children[section]
     }
     
-    fileprivate func setting(for id:String) -> Setting? {
-        for s in root.children {
-            if let result = s.settingForId(target: id) {
-                return result
-            }
-        }
-        return nil
-    }
-    
     fileprivate var numberOfGroups : Int {
         return root.children.count
     }
@@ -100,6 +91,11 @@ extension SettingsViewController : UITableViewDelegate {
         navigationController?.pushViewController(optionsVC, animated: true)
     }
     
+    private func navigateToGroup(subRoot:GroupSetting) {
+        let optionsVC = SettingsViewController(root: subRoot, delegate: delegate!, dataStore: defaultsStore)
+        navigationController?.pushViewController(optionsVC, animated: true)
+    }
+    
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
@@ -111,6 +107,8 @@ extension SettingsViewController : UITableViewDelegate {
             case let .Select(s):
                 let currentValue = s.value(from: defaultsStore)
                 navigateToSelect(options: s.options, label:s.label, key:s.key, value:currentValue!)
+            case let .Group(g):
+                navigateToGroup(subRoot: g)
             default:
                 break
             }
@@ -170,9 +168,9 @@ extension SettingsViewController : UITableViewDataSource {
     
     @objc
     fileprivate func switchValueChanged(s:UISwitch) {
-        if let id = s.restorationIdentifier, let _ = setting(for: id) {
-            defaultsStore.set(s.isOn, forKey: id)
-            delegate?.settingsViewController(vc: self, didUpdateSetting: id)
+        if let key = s.restorationIdentifier, let _ = root.setting(for: key) {
+            defaultsStore.set(s.isOn, forKey: key)
+            delegate?.settingsViewController(vc: self, didUpdateSetting: key)
         }
     }
     
@@ -202,6 +200,11 @@ extension SettingsViewController : UITableViewDataSource {
     private func configureInfoCell(cell:SettingsTableCell, setting:InfoSetting) {
         cell.textLabel?.text = setting.label
         cell.detailTextLabel?.text = setting.text
+    }
+    
+    private func configureGroupCell(cell:SettingsTableCell, setting:GroupSetting) {
+        cell.textLabel?.text = setting.title
+        cell.accessoryType = .disclosureIndicator
     }
     
     private func configureSelectOptionCell(cell:SettingsTableCell, setting:SelectSetting, index:Int) {
@@ -239,7 +242,12 @@ extension SettingsViewController : UITableViewDataSource {
             configureInfoCell(cell: cell, setting: i)
             return cell
             
-        case .Slider, .Group:
+        case let .Group(g):
+            let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableCell.reuseIdentifier, for: indexPath) as! SettingsTableCell
+            configureGroupCell(cell: cell, setting: g)
+            return cell
+            
+        case .Slider:
             fatalError()
         }
 
