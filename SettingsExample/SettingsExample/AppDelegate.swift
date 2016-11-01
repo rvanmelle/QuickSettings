@@ -26,10 +26,10 @@ let dogOptions = EnumSettingsOptions<Dogs>(defaultValue:.Lady)
 let settings = [
     quickGroup(title:"General", children:[
         quickToggle(label:"Foo", id:"general.foo", defaultValue:true),
-        quickToggle(label:"Bar", id:"general.bar", defaultValue:false),
+        quickInfo(label: "Bar Info", text: "this is what bar is"),
         quickSelect(label:"Bar2", id:"general.bar2", options:dogOptions),
         quickText(label:"Baz", id:"general.baz", defaultValue:"Saskatoon"),
-    ]),
+        ], footer:"This is a great section for adding lots of random settings that are not really necessary."),
     
     quickText(label:"Info", id:"general.info", defaultValue:"Swing"),
     
@@ -55,8 +55,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let dataStore = UserDefaults.standard
         quickInit(settings: settings, datastore: dataStore)
-        let vc = SettingsViewController(settings:settings, delegate:self, dataStore:dataStore)
-        vc.title = "Settings Example"
+        let root = GroupSetting(title:"Settings Example", children:settings, footer:nil)
+        let vc = SettingsViewController(root: root, delegate: self, dataStore: dataStore)
         let nav = UINavigationController(rootViewController: vc)
         window?.rootViewController = nav
         

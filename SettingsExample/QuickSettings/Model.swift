@@ -51,6 +51,9 @@ private func iterateEnum<T: Hashable>(_: T.Type) -> AnyIterator<T> {
     }
 }
 
+// http://nshipster.com/swift-documentation/
+// http://useyourloaf.com/blog/swift-documentation-quick-guide/
+
 /**
  Initializes the dataStore to fill in any missing values with defaults.
  - parameter settings: the settings to be initialized
@@ -79,7 +82,7 @@ public func quickReset(settings:[Setting], datastore : SettingsDataSource) {
  - returns: a Setting of type Setting.Toggle
  */
 public func quickToggle(label:String, id:String, defaultValue:Bool) -> Setting {
-    return Setting.Toggle(label: label, id: id, default: defaultValue)
+    return Setting.Toggle(ToggleSetting(label: label, key: id, defaultValue: defaultValue))
 }
 
 /**
@@ -92,7 +95,7 @@ public func quickToggle(label:String, id:String, defaultValue:Bool) -> Setting {
  - returns: a Setting of type Setting.Slider
  */
 public func quickSlider(label:String, id:String, min:Float, max:Float, defaultValue:Float) -> Setting {
-    return Setting.Slider(label: label, id: id, min: min, max: max, default: defaultValue)
+    return Setting.Slider(SliderSetting(label: label, key: id, min: min, max: max, defaultValue: defaultValue))
 }
 
 /**
@@ -103,7 +106,17 @@ public func quickSlider(label:String, id:String, min:Float, max:Float, defaultVa
  - returns: a Setting of type Setting.Text
  */
 public func quickText(label:String, id:String, defaultValue:String? = nil) -> Setting {
-    return Setting.Text(label: label, id: id, default: defaultValue)
+    return Setting.Text(TextSetting(label: label, key: id, defaultValue: defaultValue))
+}
+
+/**
+ Handy function to create an Info setting
+ - parameter label: the info title to display to the user
+ - parameter text: the text info to display to the user
+ - returns: a Setting of type Setting.Info
+ */
+public func quickInfo(label:String, text:String) -> Setting {
+    return Setting.Info(InfoSetting(label: label, text: text))
 }
 
 /**
@@ -114,7 +127,7 @@ public func quickText(label:String, id:String, defaultValue:String? = nil) -> Se
  - returns: a Setting of type Setting.Select
  */
 public func quickSelect(label:String, id:String, options:SettingsOptions) -> Setting {
-    return Setting.Select(label: label, id: id, options: options)
+    return Setting.Select(SelectSetting(label: label, key: id, options: options))
 }
 
 /**
@@ -125,27 +138,143 @@ public func quickSelect(label:String, id:String, options:SettingsOptions) -> Set
  - returns: a Setting of type Setting.Group
  */
 public func quickGroup(title:String, children:[Setting], footer:String?=nil) -> Setting {
-    return Setting.Group(title: title, children: children)
+    return Setting.Group(GroupSetting(title: title, children: children, footer:footer))
+}
+
+public struct InfoSetting {
+    let label : String
+    let text : String
+    
+    public init(label:String, text:String) {
+        self.label = label
+        self.text = text
+    }
+}
+
+public struct ToggleSetting {
+    let label : String
+    let key : String
+    let defaultValue : Bool
+    
+    /**
+     Create a Toggle setting
+     - parameter label: the string to display to the user
+     - parameter id: the key used to store/retrieve from the datastore
+     - parameter defaultValue: value to be used if none has been set
+     - returns: a Setting of type Setting.Toggle
+     */
+    public init(label: String, key: String, defaultValue: Bool) {
+        self.label = label
+        self.key = key
+        self.defaultValue = defaultValue
+    }
+    
+    internal func value(from dataSource:SettingsDataSource) -> Bool {
+        return dataSource.hasValue(forKey: key) ? dataSource.bool(forKey: key) : defaultValue
+    }
+}
+
+public enum TextSettingType {
+    case Text
+    case Name
+    case URL
+    case Int
+    case Phone
+    case Password
+    case Email
+    case Decimal
+}
+
+public struct TextSetting {
+    let label : String
+    let key : String
+    let defaultValue : String?
+    let type : TextSettingType
+    
+    public init(label: String, key: String, defaultValue: String?, type:TextSettingType = .Text) {
+        self.label = label
+        self.key = key
+        self.defaultValue = defaultValue
+        self.type = type
+    }
+    
+    internal func value(from dataSource:SettingsDataSource) -> String? {
+        return dataSource.hasValue(forKey: key) ? dataSource.string(forKey: key) : defaultValue
+    }
+}
+
+public struct SliderSetting {
+    let label : String
+    let key : String
+    let min : Float
+    let max : Float
+    let defaultValue : Float
+    
+    public init(label: String, key: String, min:Float, max:Float, defaultValue: Float) {
+        self.label = label
+        self.key = key
+        self.min = min
+        self.max = max
+        self.defaultValue = defaultValue
+    }
+}
+
+public struct GroupSetting {
+    let title : String
+    let children : [Setting]
+    let footer : String?
+    
+    public init(title: String, children: [Setting], footer: String?) {
+        self.title = title
+        self.children = children
+        self.footer = footer
+    }
+}
+
+public struct SelectSetting {
+    let label : String
+    let key : String
+    let options : SettingsOptions
+    
+    public init(label: String, key: String, options:SettingsOptions) {
+        self.label = label
+        self.key = key
+        self.options = options
+    }
+    
+    internal func value(from dataSource:SettingsDataSource) -> String? {
+        if dataSource.hasValue(forKey: key) {
+            let proposedValue = dataSource.string(forKey: key)!
+            if options.options.contains(proposedValue) {
+                return proposedValue
+            } else {
+                return options.defaultValue
+            }
+        } else {
+            return options.defaultValue
+        }
+    }
 }
 
 public enum Setting {
     
-    case Toggle(label:String, id:String, default:Bool)
-    case Slider(label:String, id:String, min:Float, max:Float, default:Float)
-    case Text(label:String, id:String, default:String?)
-    case Select(label:String, id:String, options:SettingsOptions)
-    indirect case Group(title:String, children:[Setting])
+    case Toggle(ToggleSetting)
+    case Slider(SliderSetting)
+    case Text(TextSetting)
+    case Select(SelectSetting)
+    case Info(InfoSetting)
+    indirect case Group(GroupSetting)
     
     internal var uniqueId : String? {
         switch self {
-        case let .Toggle(_, id, _):
-            return id
-        case let .Slider(_,id,_,_,_):
-            return id
-        case let .Text(_,id,_):
-            return id
-        case let .Select(_,id,_):
-            return id
+        case let .Toggle(s):
+            return s.key
+        case let .Slider(s):
+            return s.key
+        case let .Text(t):
+            return t.key
+        case let .Select(s):
+            return s.key
         default:
             return nil
         }
@@ -153,20 +282,22 @@ public enum Setting {
     
     internal func settingForId(target:String) -> Setting? {
         switch self {
-        case let .Toggle(_, id, _):
-            return id == target ? self : nil
-        case let .Slider(_,id,_,_,_):
-            return id == target ? self : nil
-        case let .Text(_,id,_):
-            return id == target ? self : nil
-        case let .Select(_,id,_):
-            return id == target ? self : nil
-        case let .Group(_, children: children):
-            for c in children {
+        case let .Toggle(s):
+            return s.key == target ? self : nil
+        case let .Slider(s):
+            return s.key == target ? self : nil
+        case let .Text(t):
+            return t.key == target ? self : nil
+        case let .Select(s):
+            return s.key == target ? self : nil
+        case let .Group(g):
+            for c in g.children {
                 if let s = c.settingForId(target: target) {
                     return s
                 }
             }
+            return nil
+        case .Info:
             return nil
         }
         
@@ -199,109 +330,41 @@ extension UserDefaults : SettingsDataSource {
 
 extension Setting {
     
-    fileprivate func bool(forKey key:String, dataSource:SettingsDataSource) -> Bool {
-        switch self {
-        case let .Toggle(_,_,defaultValue):
-            return dataSource.hasValue(forKey: key) ? dataSource.bool(forKey: key) : defaultValue
-        default:
-            fatalError()
-        }
-    }
-    fileprivate func float(forKey key:String, dataSource:SettingsDataSource) -> Float {
-        switch self {
-        case let .Slider(_,_,_,_,defaultValue):
-            return dataSource.hasValue(forKey: key) ? dataSource.float(forKey: key) : defaultValue
-        default:
-            fatalError()
-        }
-        
-    }
-    fileprivate func integer(forKey key:String, dataSource:SettingsDataSource) -> Int {
-        fatalError()
-    }
-    
-    internal func string(forKey key:String, dataSource:SettingsDataSource) -> String? {
-        switch self {
-        case let .Text(_,_,defaultValue):
-            return dataSource.hasValue(forKey: key) ? dataSource.string(forKey: key) : defaultValue
-            
-        case let .Select(_, _, settingsOptions):
-            if dataSource.hasValue(forKey: key) {
-                let proposedValue = dataSource.string(forKey: key)!
-                if settingsOptions.options.contains(proposedValue) {
-                    return proposedValue
-                } else {
-                    return settingsOptions.defaultValue
-                }
-            } else {
-                return settingsOptions.defaultValue
-            }
-            
-        default:
-            fatalError()
-        }
-        
-    }
-    
     internal func reset(_ dataSource:SettingsDataSource) {
         switch self {
-        case let .Toggle(_, key, d):
-            dataSource.set(d, forKey: key)
-        case let .Slider(_,key,_,_,d):
-            dataSource.set(d, forKey: key)
-        case let .Text(_,key,d):
-            dataSource.set(d, forKey: key)
-        case let .Select(_,key,options):
-            dataSource.set(options.defaultValue, forKey: key)
-        case let .Group(_, children: children):
-            for c in children {
+        case let .Toggle(s):
+            dataSource.set(s.defaultValue, forKey: s.key)
+        case let .Slider(s):
+            dataSource.set(s.defaultValue, forKey: s.key)
+        case let .Text(t):
+            dataSource.set(t.defaultValue, forKey: t.key)
+        case let .Select(s):
+            dataSource.set(s.options.defaultValue, forKey: s.key)
+        case let .Group(g):
+            for c in g.children {
                 c.reset(dataSource)
             }
+        case .Info: break
         }
     }
 
     
     internal func initialize(_ dataSource:SettingsDataSource) {
         switch self {
-        case let .Toggle(_, key, _):
-            if !dataSource.hasValue(forKey: key) { reset(dataSource) }
-        case let .Slider(_,key,_,_,_):
-            if !dataSource.hasValue(forKey: key) { reset(dataSource) }
-        case let .Text(_,key,_):
-            if !dataSource.hasValue(forKey: key) { reset(dataSource) }
-        case let .Select(_,key,_):
-            if !dataSource.hasValue(forKey: key) { reset(dataSource) }
-        case let .Group(_, children: children):
-            for c in children {
+        case let .Toggle(s):
+            if !dataSource.hasValue(forKey: s.key) { reset(dataSource) }
+        case let .Slider(s):
+            if !dataSource.hasValue(forKey: s.key) { reset(dataSource) }
+        case let .Text(t):
+            if !dataSource.hasValue(forKey: t.key) { reset(dataSource) }
+        case let .Select(s):
+            if !dataSource.hasValue(forKey: s.key) { reset(dataSource) }
+        case let .Group(g):
+            for c in g.children {
                 c.initialize(dataSource)
             }
+        case .Info: break
         }
     }
     
-    internal func configure(cell:UITableViewCell, dataSource:SettingsDataSource) {
-        switch self {
-        case .Group:
-            fatalError()
-            
-        case let .Toggle(label,key,_):
-            cell.textLabel?.text = label
-            cell.detailTextLabel?.text = nil
-            let s = UISwitch()
-            s.isOn = bool(forKey: key, dataSource: dataSource)
-            cell.accessoryView = s
-            
-        case let .Text(label,key,_):
-            cell.textLabel?.text = label
-            cell.detailTextLabel?.text = string(forKey: key, dataSource: dataSource)
-            
-        case let .Select(label, key, _):
-            cell.textLabel?.text = label
-            cell.detailTextLabel?.text = string(forKey: key, dataSource: dataSource)
-            cell.accessoryType = .disclosureIndicator
-            
-        case .Slider:
-            fatalError()
-            
-        }
-    }
 }

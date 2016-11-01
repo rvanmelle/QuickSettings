@@ -36,8 +36,8 @@ class SettingsOptionsViewController: SettingsBaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView!.dataSource = self
-        self.tableView!.delegate = self
+        self.tableView.dataSource = self
+        self.tableView.delegate = self
     }
     
 }

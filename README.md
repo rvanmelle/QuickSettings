@@ -22,13 +22,15 @@ github "rvanmelle/QuickSettings"
 
 ## ToDo
 
-* text editing either via editable cells or alertview (support email, password, url, etc.)
+* editable text cells
+  * keyboard avoiding
+  * configuration for different types
 * stepper for integer values
 * slider for float values
 * inline group selection
 * section footers
-* custom UserDefaults
 * usage from storyboard
+* action buttons
 * unit tests
 
 ## Usage
@@ -88,8 +90,10 @@ To use, simply declare a SettingsViewController, typically inside a navigation c
 ```swift
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
-        let vc = SettingsViewController(settings:settings, delegate:self)
-        vc.title = "Settings Example"
+        let dataStore = UserDefaults.standard
+        quickInit(settings: settings, datastore: dataStore)
+        let root = GroupSetting(title:"Settings Example", children:settings, footer:nil)
+        let vc = SettingsViewController(root: root, delegate: self, dataStore: dataStore)
         let nav = UINavigationController(rootViewController: vc)
         window?.rootViewController = nav
         
