@@ -13,7 +13,7 @@ import Foundation
  SettingsOptions protocol. This includes a list of the string options to be
  displayed to the user and a defaultValue if nothing has been selected.
  */
-public protocol SettingsOptions {
+public protocol QSSettingsOptions {
     var options : [String] { get }
     var defaultValue : String { get }
 }
@@ -23,7 +23,7 @@ public protocol SettingsOptions {
  SettingsOptions. This allows a string enumeration to be easily used to display
  a set of options to the user.
 */
-public class EnumSettingsOptions<T:Hashable> : SettingsOptions where T : RawRepresentable, T.RawValue == String {
+public class QSEnumSettingsOptions<T:Hashable> : QSSettingsOptions where T : RawRepresentable, T.RawValue == String {
     
     private let defaultVal : T
     public init(defaultValue:T) {
@@ -60,7 +60,7 @@ private func iterateEnum<T: Hashable>(_: T.Type) -> AnyIterator<T> {
  - parameter datastore: the conforming datastore to be initialized
  - important: THIS WILL NOT OVERWRITE EXISTING VALUES
  */
-public func quickInit(settings:[Setting], datastore : SettingsDataSource) {
+public func QSInit(settings:[QSSetting], datastore : QSSettingsDataSource) {
     for s in settings { s.initialize(datastore) }
 }
 
@@ -70,7 +70,7 @@ public func quickInit(settings:[Setting], datastore : SettingsDataSource) {
  - parameter datastore: the conforming datastore to be initialized
  - Warning: DESTRUCTIVE OPERATION -- this will overwrite existing data with defaults
  */
-public func quickReset(settings:[Setting], datastore : SettingsDataSource) {
+public func QSReset(settings:[QSSetting], datastore : QSSettingsDataSource) {
     for s in settings { s.reset(datastore) }
 }
 
@@ -81,8 +81,8 @@ public func quickReset(settings:[Setting], datastore : SettingsDataSource) {
  - parameter defaultValue: value to be used if none has been set
  - returns: a Setting of type Setting.Toggle
  */
-public func quickToggle(label:String, id:String, defaultValue:Bool) -> Setting {
-    return Setting.Toggle(ToggleSetting(label: label, key: id, defaultValue: defaultValue))
+public func QSToggle(label:String, id:String, defaultValue:Bool) -> QSSetting {
+    return QSSetting.Toggle(QSToggleSetting(label: label, key: id, defaultValue: defaultValue))
 }
 
 /**
@@ -94,8 +94,8 @@ public func quickToggle(label:String, id:String, defaultValue:Bool) -> Setting {
  - parameter defaultValue: value to be used if none has been set
  - returns: a Setting of type Setting.Slider
  */
-public func quickSlider(label:String, id:String, min:Float, max:Float, defaultValue:Float) -> Setting {
-    return Setting.Slider(SliderSetting(label: label, key: id, min: min, max: max, defaultValue: defaultValue))
+public func QSSlider(label:String, id:String, min:Float, max:Float, defaultValue:Float) -> QSSetting {
+    return QSSetting.Slider(QSSliderSetting(label: label, key: id, min: min, max: max, defaultValue: defaultValue))
 }
 
 /**
@@ -105,8 +105,8 @@ public func quickSlider(label:String, id:String, min:Float, max:Float, defaultVa
  - parameter defaultValue: value to be used if none has been set
  - returns: a Setting of type Setting.Text
  */
-public func quickText(label:String, id:String, defaultValue:String? = nil) -> Setting {
-    return Setting.Text(TextSetting(label: label, key: id, defaultValue: defaultValue))
+public func QSText(label:String, id:String, defaultValue:String? = nil) -> QSSetting {
+    return QSSetting.Text(QSTextSetting(label: label, key: id, defaultValue: defaultValue))
 }
 
 /**
@@ -115,8 +115,8 @@ public func quickText(label:String, id:String, defaultValue:String? = nil) -> Se
  - parameter text: the text info to display to the user
  - returns: a Setting of type Setting.Info
  */
-public func quickInfo(label:String, text:String) -> Setting {
-    return Setting.Info(InfoSetting(label: label, text: text))
+public func QSInfo(label:String, text:String) -> QSSetting {
+    return QSSetting.Info(QSInfoSetting(label: label, text: text))
 }
 
 /**
@@ -126,8 +126,8 @@ public func quickInfo(label:String, text:String) -> Setting {
  - parameter options: an object conforming to SettingsOptions
  - returns: a Setting of type Setting.Select
  */
-public func quickSelect(label:String, id:String, options:SettingsOptions) -> Setting {
-    return Setting.Select(SelectSetting(label: label, key: id, options: options))
+public func QSSelect(label:String, id:String, options:QSSettingsOptions) -> QSSetting {
+    return QSSetting.Select(QSSelectSetting(label: label, key: id, options: options))
 }
 
 /**
@@ -137,11 +137,11 @@ public func quickSelect(label:String, id:String, options:SettingsOptions) -> Set
  - parameter footer: a description string displayed underneath the group
  - returns: a Setting of type Setting.Group
  */
-public func quickGroup(title:String, children:[Setting], footer:String?=nil) -> Setting {
-    return Setting.Group(GroupSetting(title: title, children: children, footer:footer))
+public func QSGroup(title:String, children:[QSSetting], footer:String?=nil) -> QSSetting {
+    return QSSetting.Group(QSGroupSetting(title: title, children: children, footer:footer))
 }
 
-public struct InfoSetting {
+public struct QSInfoSetting {
     let label : String
     let text : String
     
@@ -151,7 +151,7 @@ public struct InfoSetting {
     }
 }
 
-public struct ToggleSetting {
+public struct QSToggleSetting {
     let label : String
     let key : String
     let defaultValue : Bool
@@ -169,12 +169,12 @@ public struct ToggleSetting {
         self.defaultValue = defaultValue
     }
     
-    internal func value(from dataSource:SettingsDataSource) -> Bool {
+    internal func value(from dataSource:QSSettingsDataSource) -> Bool {
         return dataSource.hasValue(forKey: key) ? dataSource.bool(forKey: key) : defaultValue
     }
 }
 
-public enum TextSettingType {
+public enum QSTextSettingType {
     case Text
     case Name
     case URL
@@ -185,25 +185,25 @@ public enum TextSettingType {
     case Decimal
 }
 
-public struct TextSetting {
+public struct QSTextSetting {
     let label : String
     let key : String
     let defaultValue : String?
-    let type : TextSettingType
+    let type : QSTextSettingType
     
-    public init(label: String, key: String, defaultValue: String?, type:TextSettingType = .Text) {
+    public init(label: String, key: String, defaultValue: String?, type:QSTextSettingType = .Text) {
         self.label = label
         self.key = key
         self.defaultValue = defaultValue
         self.type = type
     }
     
-    internal func value(from dataSource:SettingsDataSource) -> String? {
+    internal func value(from dataSource:QSSettingsDataSource) -> String? {
         return dataSource.hasValue(forKey: key) ? dataSource.string(forKey: key) : defaultValue
     }
 }
 
-public struct SliderSetting {
+public struct QSSliderSetting {
     let label : String
     let key : String
     let min : Float
@@ -219,18 +219,18 @@ public struct SliderSetting {
     }
 }
 
-public struct GroupSetting {
+public struct QSGroupSetting {
     let title : String
-    let children : [Setting]
+    let children : [QSSetting]
     let footer : String?
     
-    public init(title: String, children: [Setting], footer: String?) {
+    public init(title: String, children: [QSSetting], footer: String?) {
         self.title = title
         self.children = children
         self.footer = footer
     }
     
-    internal func setting(for key:String) -> Setting? {
+    internal func setting(for key:String) -> QSSetting? {
         for c in children {
             if let s = c.settingForId(target: key) {
                 return s
@@ -240,18 +240,18 @@ public struct GroupSetting {
     }
 }
 
-public struct SelectSetting {
+public struct QSSelectSetting {
     let label : String
     let key : String
-    let options : SettingsOptions
+    let options : QSSettingsOptions
     
-    public init(label: String, key: String, options:SettingsOptions) {
+    public init(label: String, key: String, options:QSSettingsOptions) {
         self.label = label
         self.key = key
         self.options = options
     }
     
-    internal func value(from dataSource:SettingsDataSource) -> String? {
+    internal func value(from dataSource:QSSettingsDataSource) -> String? {
         if dataSource.hasValue(forKey: key) {
             let proposedValue = dataSource.string(forKey: key)!
             if options.options.contains(proposedValue) {
@@ -265,14 +265,14 @@ public struct SelectSetting {
     }
 }
 
-public enum Setting {
+public enum QSSetting {
     
-    case Toggle(ToggleSetting)
-    case Slider(SliderSetting)
-    case Text(TextSetting)
-    case Select(SelectSetting)
-    case Info(InfoSetting)
-    indirect case Group(GroupSetting)
+    case Toggle(QSToggleSetting)
+    case Slider(QSSliderSetting)
+    case Text(QSTextSetting)
+    case Select(QSSelectSetting)
+    case Info(QSInfoSetting)
+    indirect case Group(QSGroupSetting)
     
     internal var uniqueId : String? {
         switch self {
@@ -289,7 +289,7 @@ public enum Setting {
         }
     }
     
-    internal func settingForId(target:String) -> Setting? {
+    internal func settingForId(target:String) -> QSSetting? {
         switch self {
         case let .Toggle(s):
             return s.key == target ? self : nil
@@ -313,7 +313,7 @@ public enum Setting {
     }
 }
 
-public protocol SettingsDataSource {
+public protocol QSSettingsDataSource {
     
     func bool(forKey:String) -> Bool
     func float(forKey:String) -> Float
@@ -327,7 +327,10 @@ public protocol SettingsDataSource {
 }
 
 
-extension UserDefaults : SettingsDataSource {
+/**
+ Make user defaults conform to the SettingsDataSource protocol
+ */
+extension UserDefaults : QSSettingsDataSource {
     public func hasValue(forKey key: String) -> Bool {
         if let _ = value(forKey: key) {
             return true
@@ -337,9 +340,9 @@ extension UserDefaults : SettingsDataSource {
     }
 }
 
-extension Setting {
+extension QSSetting {
     
-    internal func reset(_ dataSource:SettingsDataSource) {
+    internal func reset(_ dataSource:QSSettingsDataSource) {
         switch self {
         case let .Toggle(s):
             dataSource.set(s.defaultValue, forKey: s.key)
@@ -358,7 +361,7 @@ extension Setting {
     }
 
     
-    internal func initialize(_ dataSource:SettingsDataSource) {
+    internal func initialize(_ dataSource:QSSettingsDataSource) {
         switch self {
         case let .Toggle(s):
             if !dataSource.hasValue(forKey: s.key) { reset(dataSource) }

@@ -17,10 +17,10 @@
 		63B3371D1DC6499E00A2421E /* QuickSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 63B3370D1DC6499E00A2421E /* QuickSettings.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		63B337201DC6499E00A2421E /* QuickSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63B3370B1DC6499E00A2421E /* QuickSettings.framework */; };
 		63B337211DC6499E00A2421E /* QuickSettings.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 63B3370B1DC6499E00A2421E /* QuickSettings.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		63B3372A1DC649E700A2421E /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B337291DC649E700A2421E /* SettingsViewController.swift */; };
+		63B3372A1DC649E700A2421E /* QSSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B337291DC649E700A2421E /* QSSettingsViewController.swift */; };
 		63B3372C1DC649FD00A2421E /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B3372B1DC649FD00A2421E /* Model.swift */; };
-		63B3372E1DC64A4600A2421E /* SettingsOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B3372D1DC64A4600A2421E /* SettingsOptionsViewController.swift */; };
-		63B337301DC64A6700A2421E /* SettingsTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B3372F1DC64A6700A2421E /* SettingsTableCell.swift */; };
+		63B3372E1DC64A4600A2421E /* QSSettingsOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B3372D1DC64A4600A2421E /* QSSettingsOptionsViewController.swift */; };
+		63B337301DC64A6700A2421E /* QSSettingsTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B3372F1DC64A6700A2421E /* QSSettingsTableCell.swift */; };
 		63B337331DC6541D00A2421E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63B337311DC6541D00A2421E /* Main.storyboard */; };
 		63B337351DC6547A00A2421E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B337341DC6547A00A2421E /* ViewController.swift */; };
 		63C327241DC8035A001E5542 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C327231DC8035A001E5542 /* UIView+Extensions.swift */; };
@@ -96,10 +96,10 @@
 		63B337131DC6499E00A2421E /* QuickSettingsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuickSettingsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		63B3371A1DC6499E00A2421E /* QuickSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSettingsTests.swift; sourceTree = "<group>"; };
 		63B3371C1DC6499E00A2421E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		63B337291DC649E700A2421E /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		63B337291DC649E700A2421E /* QSSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QSSettingsViewController.swift; sourceTree = "<group>"; };
 		63B3372B1DC649FD00A2421E /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
-		63B3372D1DC64A4600A2421E /* SettingsOptionsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsOptionsViewController.swift; sourceTree = "<group>"; };
-		63B3372F1DC64A6700A2421E /* SettingsTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTableCell.swift; sourceTree = "<group>"; };
+		63B3372D1DC64A4600A2421E /* QSSettingsOptionsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QSSettingsOptionsViewController.swift; sourceTree = "<group>"; };
+		63B3372F1DC64A6700A2421E /* QSSettingsTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QSSettingsTableCell.swift; sourceTree = "<group>"; };
 		63B337321DC6541D00A2421E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		63B337341DC6547A00A2421E /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		63C327231DC8035A001E5542 /* UIView+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
@@ -206,9 +206,9 @@
 			children = (
 				63B3370E1DC6499E00A2421E /* Info.plist */,
 				63B3370D1DC6499E00A2421E /* QuickSettings.h */,
-				63B337291DC649E700A2421E /* SettingsViewController.swift */,
-				63B3372D1DC64A4600A2421E /* SettingsOptionsViewController.swift */,
-				63B3372F1DC64A6700A2421E /* SettingsTableCell.swift */,
+				63B337291DC649E700A2421E /* QSSettingsViewController.swift */,
+				63B3372D1DC64A4600A2421E /* QSSettingsOptionsViewController.swift */,
+				63B3372F1DC64A6700A2421E /* QSSettingsTableCell.swift */,
 				63B3372B1DC649FD00A2421E /* Model.swift */,
 				63C327221DC8033D001E5542 /* Extensions */,
 			);
@@ -472,11 +472,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				63B3372A1DC649E700A2421E /* SettingsViewController.swift in Sources */,
-				63B3372E1DC64A4600A2421E /* SettingsOptionsViewController.swift in Sources */,
+				63B3372A1DC649E700A2421E /* QSSettingsViewController.swift in Sources */,
+				63B3372E1DC64A4600A2421E /* QSSettingsOptionsViewController.swift in Sources */,
 				63C327241DC8035A001E5542 /* UIView+Extensions.swift in Sources */,
 				63B3372C1DC649FD00A2421E /* Model.swift in Sources */,
-				63B337301DC64A6700A2421E /* SettingsTableCell.swift in Sources */,
+				63B337301DC64A6700A2421E /* QSSettingsTableCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

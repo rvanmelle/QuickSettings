@@ -8,7 +8,7 @@
 
 import Foundation
 
-class SettingsTableCell : UITableViewCell {
+class QSSettingsTableCell : UITableViewCell {
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
@@ -16,6 +16,14 @@ class SettingsTableCell : UITableViewCell {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
+    }
+    
+    class func dequeue(_ tableView:UITableView, for indexPath:IndexPath) -> QSSettingsTableCell {
+        return tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! QSSettingsTableCell
+    }
+    
+    class func register(_ tableView:UITableView) {
+        tableView.register(self, forCellReuseIdentifier: reuseIdentifier)
     }
     
     static var reuseIdentifier: String {
@@ -31,7 +39,7 @@ class SettingsTableCell : UITableViewCell {
     }
 }
 
-class SettingsTextTableCell : UITableViewCell {
+class QSSettingsTextTableCell : UITableViewCell {
     
     let field = UITextField()
     
@@ -43,6 +51,14 @@ class SettingsTextTableCell : UITableViewCell {
         contentView.pinItemFillMarginsVertically(field)
         contentView.pinItem(field, attribute: .right, to:  contentView, toAttribute: .rightMargin)
         contentView.pinItem(field, attribute: .left, to: contentView, toAttribute: .centerX)
+    }
+    
+    class func dequeue(_ tableView:UITableView, for indexPath:IndexPath) -> QSSettingsTextTableCell {
+        return tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! QSSettingsTextTableCell
+    }
+    
+    class func register(_ tableView:UITableView) {
+        tableView.register(self, forCellReuseIdentifier: reuseIdentifier)
     }
     
     required init?(coder aDecoder: NSCoder) {

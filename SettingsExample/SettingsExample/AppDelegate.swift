@@ -20,30 +20,30 @@ enum Speed : String {
     case Fastest
 }
 
-let speedOptions = EnumSettingsOptions<Speed>(defaultValue:.Fastest)
-let dogOptions = EnumSettingsOptions<Dogs>(defaultValue:.Lady)
+let speedOptions = QSEnumSettingsOptions<Speed>(defaultValue:.Fastest)
+let dogOptions = QSEnumSettingsOptions<Dogs>(defaultValue:.Lady)
 
 let settings = [
-    quickGroup(title:"General", children:[
-        quickToggle(label:"Foo", id:"general.foo", defaultValue:true),
-        quickInfo(label: "Bar Info", text: "this is what bar is"),
-        quickSelect(label:"Bar2", id:"general.bar2", options:dogOptions),
-        quickText(label:"Baz", id:"general.baz", defaultValue:"Saskatoon"),
+    QSGroup(title:"General", children:[
+        QSToggle(label:"Foo", id:"general.foo", defaultValue:true),
+        QSInfo(label: "Bar Info", text: "this is what bar is"),
+        QSSelect(label:"Bar2", id:"general.bar2", options:dogOptions),
+        QSText(label:"Baz", id:"general.baz", defaultValue:"Saskatoon"),
     ], footer:"This is a great section for adding lots of random settings that are not really necessary."),
     
-    quickText(label:"Info", id:"general.info", defaultValue:"Swing"),
+    QSText(label:"Info", id:"general.info", defaultValue:"Swing"),
     
-    quickSelect(label:"How fast?", id:"speed", options:speedOptions),
+    QSSelect(label:"How fast?", id:"speed", options:speedOptions),
     
-    quickToggle(label:"Should I?", id:"general.shouldi", defaultValue:true),
+    QSToggle(label:"Should I?", id:"general.shouldi", defaultValue:true),
     
-    quickGroup(title:"Extra", children:[
-        quickToggle(label:"Foo", id:"extra.foo", defaultValue:false),
-        quickToggle(label:"Bar", id:"extra.bar", defaultValue:true),
-        quickText(label:"Baz", id:"extra.baz", defaultValue:"TomTom"),
+    QSGroup(title:"Extra", children:[
+        QSToggle(label:"Foo", id:"extra.foo", defaultValue:false),
+        QSToggle(label:"Bar", id:"extra.bar", defaultValue:true),
+        QSText(label:"Baz", id:"extra.baz", defaultValue:"TomTom"),
         
-        quickGroup(title:"SubGroup", children:[
-            quickToggle(label:"SubFoo", id:"extra.subfoo", defaultValue:false),
+        QSGroup(title:"SubGroup", children:[
+            QSToggle(label:"SubFoo", id:"extra.subfoo", defaultValue:false),
         ])
         
     ])
@@ -59,9 +59,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
         let dataStore = UserDefaults.standard
-        quickInit(settings: settings, datastore: dataStore)
-        let root = GroupSetting(title:"Settings Example", children:settings, footer:nil)
-        let vc = SettingsViewController(root: root, delegate: self, dataStore: dataStore)
+        QSInit(settings: settings, datastore: dataStore)
+        let root = QSGroupSetting(title:"Settings Example", children:settings, footer:"Made with a moderate amount of love by a developer who just wants to get stuff done. This library can be used freely without credit.")
+        let vc = QSSettingsViewController(root: root, delegate: self, dataStore: dataStore)
         let nav = UINavigationController(rootViewController: vc)
         window?.rootViewController = nav
         
@@ -93,8 +93,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
-extension AppDelegate : SettingsViewControllerDelegate {
-    func settingsViewController(vc: SettingsViewController, didUpdateSetting id: String) {
+extension AppDelegate : QSSettingsViewControllerDelegate {
+    func settingsViewController(vc: QSSettingsViewController, didUpdateSetting id: String) {
         
     }
 }

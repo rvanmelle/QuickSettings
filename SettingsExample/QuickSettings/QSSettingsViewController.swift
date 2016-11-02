@@ -11,15 +11,15 @@ import Foundation
 
 // Base Class
 
-public class SettingsBaseViewController: UIViewController {
+public class QSSettingsBaseViewController: UIViewController {
     
     let tableView = UITableView(frame: CGRect.zero, style: .grouped)
     
     override public func viewDidLoad() {
         super.viewDidLoad()
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(SettingsTableCell.self, forCellReuseIdentifier: SettingsTableCell.reuseIdentifier)
-        tableView.register(SettingsTextTableCell.self, forCellReuseIdentifier: SettingsTextTableCell.reuseIdentifier)
+        QSSettingsTableCell.register(tableView)
+        QSSettingsTextTableCell.register(tableView)
         view.addSubview(tableView)
         view.pinItemFillAll(tableView)
     }
@@ -29,16 +29,19 @@ public class SettingsBaseViewController: UIViewController {
 
 // Main Settings
 
-public protocol SettingsViewControllerDelegate : class {
-    func settingsViewController(vc:SettingsViewController, didUpdateSetting id:String)
+public protocol QSSettingsViewControllerDelegate : class {
+    func settingsViewController(vc:QSSettingsViewController, didUpdateSetting id:String)
 }
 
-public class SettingsViewController: SettingsBaseViewController {
+public class QSSettingsViewController: QSSettingsBaseViewController {
     
-    weak var delegate : SettingsViewControllerDelegate?
+    weak var delegate : QSSettingsViewControllerDelegate?
     
-    public var root = GroupSetting(title: "Settings", children: [], footer:nil)
-    public var defaultsStore : SettingsDataSource = UserDefaults.standard
+    public var root = QSGroupSetting(title: "Settings", children: [], footer:nil)
+    public var defaultsStore : QSSettingsDataSource = UserDefaults.standard
+    
+    private var footerLabel : UILabel?
+    private var footerLabelInsets = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
     
     /**
      Create a new SettingsViewController
@@ -46,7 +49,7 @@ public class SettingsViewController: SettingsBaseViewController {
      - parameter delegate: Delegate to be notified of changes
      - parameter dataStore: The datastore where settings will be read/written to. Defaults = UserDefaults.standard
      */
-    public init(root:GroupSetting, delegate:SettingsViewControllerDelegate, dataStore:SettingsDataSource = UserDefaults.standard) {
+    public init(root:QSGroupSetting, delegate:QSSettingsViewControllerDelegate, dataStore:QSSettingsDataSource = UserDefaults.standard) {
         self.defaultsStore = dataStore
         self.root = root
         super.init(nibName: nil, bundle: nil)
@@ -57,7 +60,7 @@ public class SettingsViewController: SettingsBaseViewController {
         fatalError()
     }
     
-    fileprivate func setting(for section:Int) -> Setting {
+    fileprivate func setting(for section:Int) -> QSSetting {
         return root.children[section]
     }
     
@@ -70,29 +73,69 @@ public class SettingsViewController: SettingsBaseViewController {
         title = root.title
         self.tableView.dataSource = self
         self.tableView.delegate = self
+        
+        if let footer = root.footer {
+            let footerView = UIView()
+            let label = UILabel()
+            label.text = footer
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.textAlignment = .center
+            label.font = UIFont.italicSystemFont(ofSize: 14)
+            label.textColor = UIColor.gray
+            label.numberOfLines = 0
+            footerView.addSubview(label)
+            
+            footerLabel = label
+            tableView.tableFooterView = footerView
+            
+            footerView.pinItem(label, attribute: .top, to: footerView, toAttribute: .top, withOffset: footerLabelInsets.left)
+            footerView.pinItem(label, attribute: .bottom, to: footerView, toAttribute: .bottom, withOffset: -footerLabelInsets.right)
+            footerView.pinItem(label, attribute: .left, to: footerView, toAttribute: .left, withOffset: footerLabelInsets.top)
+            footerView.pinItem(label, attribute: .right, to: footerView, toAttribute: .right, withOffset: -footerLabelInsets.bottom)
+            
+        }
+    }
+    
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if let label = footerLabel {
+            label.preferredMaxLayoutWidth = tableView.bounds.width - (footerLabelInsets.left + footerLabelInsets.right)
+        }
+        
+        if let footerView = tableView.tableFooterView {
+            let height = footerView.systemLayoutSizeFitting(UILayoutFittingCompressedSize).height
+            var footerFrame = footerView.frame
+            
+            if height != footerFrame.size.height {
+                footerFrame.size.height = height
+                footerView.frame = footerFrame
+                tableView.tableFooterView = footerView
+            }
+        }
     }
     
 }
 
-extension SettingsViewController : SettingsOptionsViewControllerDelegate {
+extension QSSettingsViewController : QSSettingsOptionsViewControllerDelegate {
     
-    func settingsOptionsViewController(vc: SettingsOptionsViewController, didSelect option: String, for key: String) {
+    func settingsOptionsViewController(vc: QSSettingsOptionsViewController, didSelect option: String, for key: String) {
         defaultsStore.set(option, forKey: key)
         delegate?.settingsViewController(vc: self, didUpdateSetting: key)
         tableView.reloadData()
     }
 }
 
-extension SettingsViewController : UITableViewDelegate {
+extension QSSettingsViewController : UITableViewDelegate {
     
-    private func navigateToSelect(options:SettingsOptions, label:String, key:String, value:String) {
-        let optionsVC = SettingsOptionsViewController(options: options, key:key, selected:value, delegate: self)
+    private func navigateToSelect(options:QSSettingsOptions, label:String, key:String, value:String) {
+        let optionsVC = QSSettingsOptionsViewController(options: options, key:key, selected:value, delegate: self)
         optionsVC.title = label
         navigationController?.pushViewController(optionsVC, animated: true)
     }
     
-    private func navigateToGroup(subRoot:GroupSetting) {
-        let optionsVC = SettingsViewController(root: subRoot, delegate: delegate!, dataStore: defaultsStore)
+    private func navigateToGroup(subRoot:QSGroupSetting) {
+        let optionsVC = QSSettingsViewController(root: subRoot, delegate: delegate!, dataStore: defaultsStore)
         navigationController?.pushViewController(optionsVC, animated: true)
     }
     
@@ -125,7 +168,7 @@ extension SettingsViewController : UITableViewDelegate {
     }
 }
 
-extension SettingsViewController : UITableViewDataSource {
+extension QSSettingsViewController : UITableViewDataSource {
     public func numberOfSections(in tableView: UITableView) -> Int {
         return numberOfGroups
     }
@@ -174,14 +217,14 @@ extension SettingsViewController : UITableViewDataSource {
         }
     }
     
-    private func configureTextCell(cell:SettingsTextTableCell, setting:TextSetting) {
+    private func configureTextCell(cell:QSSettingsTextTableCell, setting:QSTextSetting) {
         cell.textLabel?.text = setting.label
         cell.field.restorationIdentifier = setting.key
         cell.field.delegate = self
         cell.field.text = setting.value(from: defaultsStore)
     }
     
-    private func configureToggleCell(cell:SettingsTableCell, setting:ToggleSetting) {
+    private func configureToggleCell(cell:QSSettingsTableCell, setting:QSToggleSetting) {
         cell.textLabel?.text = setting.label
         cell.detailTextLabel?.text = nil
         let s = UISwitch()
@@ -191,23 +234,23 @@ extension SettingsViewController : UITableViewDataSource {
         cell.accessoryView = s
     }
     
-    private func configureSelectDisclosureCell(cell:SettingsTableCell, setting:SelectSetting) {
+    private func configureSelectDisclosureCell(cell:QSSettingsTableCell, setting:QSSelectSetting) {
         cell.textLabel?.text = setting.label
         cell.detailTextLabel?.text = setting.value(from: defaultsStore)
         cell.accessoryType = .disclosureIndicator
     }
     
-    private func configureInfoCell(cell:SettingsTableCell, setting:InfoSetting) {
+    private func configureInfoCell(cell:QSSettingsTableCell, setting:QSInfoSetting) {
         cell.textLabel?.text = setting.label
         cell.detailTextLabel?.text = setting.text
     }
     
-    private func configureGroupCell(cell:SettingsTableCell, setting:GroupSetting) {
+    private func configureGroupCell(cell:QSSettingsTableCell, setting:QSGroupSetting) {
         cell.textLabel?.text = setting.title
         cell.accessoryType = .disclosureIndicator
     }
     
-    private func configureSelectOptionCell(cell:SettingsTableCell, setting:SelectSetting, index:Int) {
+    private func configureSelectOptionCell(cell:QSSettingsTableCell, setting:QSSelectSetting, index:Int) {
         let options = setting.options.options
         let valueToDisplay = options[index]
         cell.textLabel?.text = valueToDisplay
@@ -215,11 +258,11 @@ extension SettingsViewController : UITableViewDataSource {
         cell.accessoryType = (valueToDisplay == currentValue) ? .checkmark : .none
     }
     
-    private func settingCell(from tableView:UITableView, for setting:Setting, atTopLevel:Bool, forRowAt indexPath : IndexPath) -> UITableViewCell {
+    private func settingCell(from tableView:UITableView, for setting:QSSetting, atTopLevel:Bool, forRowAt indexPath : IndexPath) -> UITableViewCell {
         switch setting {
             
         case let .Select(s):
-            let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableCell.reuseIdentifier, for: indexPath) as! SettingsTableCell
+            let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
             if atTopLevel {
                 configureSelectOptionCell(cell: cell, setting: s, index: indexPath.row)
             } else {
@@ -228,22 +271,22 @@ extension SettingsViewController : UITableViewDataSource {
             return cell
             
         case let .Text(t):
-            let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTextTableCell.reuseIdentifier, for: indexPath) as! SettingsTextTableCell
+            let cell = QSSettingsTextTableCell.dequeue(tableView, for: indexPath)
             configureTextCell(cell: cell, setting: t)
             return cell
             
         case let .Toggle(t):
-            let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableCell.reuseIdentifier, for: indexPath) as! SettingsTableCell
+            let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
             configureToggleCell(cell: cell, setting: t)
             return cell
             
         case let .Info(i):
-            let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableCell.reuseIdentifier, for: indexPath) as! SettingsTableCell
+            let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
             configureInfoCell(cell: cell, setting: i)
             return cell
             
         case let .Group(g):
-            let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableCell.reuseIdentifier, for: indexPath) as! SettingsTableCell
+            let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
             configureGroupCell(cell: cell, setting: g)
             return cell
             
@@ -274,7 +317,7 @@ extension SettingsViewController : UITableViewDataSource {
     
 }
 
-extension SettingsViewController : UITextFieldDelegate {
+extension QSSettingsViewController : UITextFieldDelegate {
     
     public func textFieldDidEndEditing(_ textField: UITextField) {
         if let key = textField.restorationIdentifier {

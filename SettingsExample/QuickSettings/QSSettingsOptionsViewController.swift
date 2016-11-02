@@ -9,19 +9,19 @@
 import Foundation
 
 // Settings Options
-protocol SettingsOptionsViewControllerDelegate : class {
-    func settingsOptionsViewController(vc:SettingsOptionsViewController, didSelect option:String, for key:String)
+protocol QSSettingsOptionsViewControllerDelegate : class {
+    func settingsOptionsViewController(vc:QSSettingsOptionsViewController, didSelect option:String, for key:String)
 }
 
-class SettingsOptionsViewController: SettingsBaseViewController {
+class QSSettingsOptionsViewController: QSSettingsBaseViewController {
     
-    weak var delegate : SettingsOptionsViewControllerDelegate?
+    weak var delegate : QSSettingsOptionsViewControllerDelegate?
     
-    fileprivate var options : SettingsOptions
+    fileprivate var options : QSSettingsOptions
     fileprivate var selected : String
     fileprivate var optionKey : String
     
-    init(options:SettingsOptions, key:String, selected:String, delegate:SettingsOptionsViewControllerDelegate) {
+    init(options:QSSettingsOptions, key:String, selected:String, delegate:QSSettingsOptionsViewControllerDelegate) {
         self.selected = selected
         self.options = options
         self.optionKey = key
@@ -42,7 +42,7 @@ class SettingsOptionsViewController: SettingsBaseViewController {
     
 }
 
-extension SettingsOptionsViewController : UITableViewDelegate {
+extension QSSettingsOptionsViewController : UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath)
         selected = cell!.textLabel!.text!
@@ -51,7 +51,7 @@ extension SettingsOptionsViewController : UITableViewDelegate {
     }
 }
 
-extension SettingsOptionsViewController : UITableViewDataSource {
+extension QSSettingsOptionsViewController : UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -62,7 +62,7 @@ extension SettingsOptionsViewController : UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableCell.reuseIdentifier, for: indexPath) as! SettingsTableCell
+        let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
         let val = options.options[indexPath.row]
         cell.textLabel?.text = val
         cell.accessoryType = val == selected ? .checkmark : .none
