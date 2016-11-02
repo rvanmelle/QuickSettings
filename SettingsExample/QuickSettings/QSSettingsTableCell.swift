@@ -43,10 +43,20 @@ class QSSettingsTextTableCell : UITableViewCell {
     
     let field = UITextField()
     
+    var textType : QSTextSettingType = .text {
+        didSet {
+            field.autocorrectionType = textType.autocorrection
+            field.autocapitalizationType = textType.autocapitalization
+            field.isSecureTextEntry = textType.secure
+            field.keyboardType = textType.keyboard
+        }
+    }
+    
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
         field.translatesAutoresizingMaskIntoConstraints = false
         field.textAlignment = .right
+        field.returnKeyType = .done
         contentView.addSubview(field)
         contentView.pinItemFillMarginsVertically(field)
         contentView.pinItem(field, attribute: .right, to:  contentView, toAttribute: .rightMargin)

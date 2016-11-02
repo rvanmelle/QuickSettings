@@ -23,7 +23,8 @@ github "rvanmelle/QuickSettings"
 ## ToDo
 
 * editable text cells
-  * configuration for different types
+  * basic formatting (phone numbers etc)
+  * some way to validate and show errors
 * stepper for integer values
 * slider for float values
 * inline group selection
@@ -114,6 +115,7 @@ extension AppDelegate : QSSettingsViewControllerDelegate {
 
 ![Alt text](/screenshots/example1.png?raw=true "Example 1" | width=300)
 ![Alt text](/screenshots/example2.png?raw=true "Example 1" | width=300)
+![Alt text](/screenshots/example3.png?raw=true "Keyboards" | width=300)
 
 ## Using a Custom Data Store
 

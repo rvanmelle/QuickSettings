@@ -105,8 +105,8 @@ public func QSSlider(label:String, id:String, min:Float, max:Float, defaultValue
  - parameter defaultValue: value to be used if none has been set
  - returns: a Setting of type Setting.Text
  */
-public func QSText(label:String, id:String, defaultValue:String? = nil) -> QSSetting {
-    return QSSetting.Text(QSTextSetting(label: label, key: id, defaultValue: defaultValue))
+public func QSText(label:String, id:String, defaultValue:String? = nil, type:QSTextSettingType = .text) -> QSSetting {
+    return QSSetting.Text(QSTextSetting(label: label, key: id, defaultValue: defaultValue, type:type))
 }
 
 /**
@@ -175,14 +175,48 @@ public struct QSToggleSetting {
 }
 
 public enum QSTextSettingType {
-    case Text
-    case Name
-    case URL
-    case Int
-    case Phone
-    case Password
-    case Email
-    case Decimal
+    case text
+    case name
+    case url
+    case int
+    case phone
+    case password
+    case email
+    case decimal
+    
+    
+    var autocorrection : UITextAutocorrectionType {
+        switch self {
+        case .text: return .yes
+        case .decimal, .email, .int, .name, .password, .phone, .url: return .no
+        }
+    }
+    var autocapitalization : UITextAutocapitalizationType {
+        switch self {
+        case .text, .decimal, .email, .int, .password, .phone, .url: return .none
+        case .name: return .words
+        }
+    }
+    
+    var keyboard : UIKeyboardType {
+        switch self {
+        case .text: return .default
+        case .decimal: return .decimalPad
+        case .email: return .emailAddress
+        case .int: return .numberPad
+        case .name: return .namePhonePad
+        case .password: return .default
+        case .phone: return .phonePad
+        case .url: return .URL
+        }
+    }
+    
+    var secure : Bool {
+        switch self {
+        case .password: return true
+        case .text, .decimal, .email, .int, .name, .phone, .url: return false
+        }
+    }
 }
 
 public struct QSTextSetting {
@@ -191,7 +225,7 @@ public struct QSTextSetting {
     let defaultValue : String?
     let type : QSTextSettingType
     
-    public init(label: String, key: String, defaultValue: String?, type:QSTextSettingType = .Text) {
+    public init(label: String, key: String, defaultValue: String?, type:QSTextSettingType = .text) {
         self.label = label
         self.key = key
         self.defaultValue = defaultValue

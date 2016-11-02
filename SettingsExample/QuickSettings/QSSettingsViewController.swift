@@ -234,6 +234,7 @@ extension QSSettingsViewController {
         cell.field.restorationIdentifier = setting.key
         cell.field.delegate = self
         cell.field.text = setting.value(from: defaultsStore)
+        cell.textType = setting.type
     }
     
     private func configureToggleCell(cell:QSSettingsTableCell, setting:QSToggleSetting) {
