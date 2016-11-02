@@ -23,12 +23,10 @@ github "rvanmelle/QuickSettings"
 ## ToDo
 
 * editable text cells
-  * keyboard avoiding
   * configuration for different types
 * stepper for integer values
 * slider for float values
 * inline group selection
-* section footers
 * usage from storyboard
 * action buttons
 * unit tests
@@ -51,38 +49,41 @@ enum Speed : String {
     case Fastest
 }
 
-let speedOptions = EnumSettingsOptions<Speed>(defaultValue:.Fastest)
-let dogOptions = EnumSettingsOptions<Dogs>(defaultValue:.Lady)
-
 let settings = [
-    quickGroup(title:"General", children:[
-        quickToggle(label:"Foo", id:"general.foo", defaultValue:true),
-        quickToggle(label:"Bar", id:"general.bar", defaultValue:false),
-        quickSelect(label:"Bar2", id:"general.bar2", options:dogOptions),
-        quickText(label:"Baz", id:"general.baz", defaultValue:"Saskatoon"),
-    ]),
+    QSGroup(title:"General", children:[
+        QSToggle(label:"Foo", id:"general.foo", defaultValue:true),
+        QSInfo(label: "Bar Info", text: "this is what bar is"),
+        QSSelect(label:"Bar2", id:"general.bar2",
+                 options:QSEnumSettingsOptions<Dogs>(defaultValue:.Lady)),
+        QSText(label:"Baz", id:"general.baz", defaultValue:"Saskatoon"),
+    ], footer:"This is a great section for adding lots of random settings that are not really necessary."),
     
-    quickText(label:"Info", id:"general.info", defaultValue:"Swing"),
+    QSText(label:"Info", id:"general.info", defaultValue:"Swing"),
     
-    quickSelect(label:"How fast?", id:"speed", options:speedOptions),
+    QSSelect(label:"How fast?", id:"speed",
+             options:QSEnumSettingsOptions<Speed>(defaultValue:.Fastest)),
     
-    quickToggle(label:"Should I?", id:"general.shouldi", defaultValue:true),
+    QSToggle(label:"Should I?", id:"general.shouldi", defaultValue:true),
     
-    quickGroup(title:"Extra", children:[
-        quickToggle(label:"Foo", id:"extra.foo", defaultValue:false),
-        quickToggle(label:"Bar", id:"extra.bar", defaultValue:true),
-        quickText(label:"Baz", id:"extra.baz", defaultValue:"TomTom"),
+    QSGroup(title:"Extra", children:[
+        QSToggle(label:"Foo", id:"extra.foo", defaultValue:false),
+        QSToggle(label:"Bar", id:"extra.bar", defaultValue:true),
+        QSText(label:"Baz", id:"extra.baz", defaultValue:"TomTom"),
+        
+        QSGroup(title:"SubGroup", children:[
+            QSToggle(label:"SubFoo", id:"extra.subfoo", defaultValue:false),
+            ], footer:"This is a subgroup showing how the definition is recursive")
+        
     ])
 ]
-
 ```
 
 If you want to initialize your settings datastore with the declared default values OR reset all of your defaults back to defaults:
 
 ```swift
 let dataStore = UserDefaults.standard
-quickInit(settings: settings, datastore: dataStore)
-quickReset(settings: settings, dataStore: dataStore)
+QSInit(settings: settings, datastore: dataStore)
+QSReset(settings: settings, dataStore: dataStore)
 ```
 
 To use, simply declare a SettingsViewController, typically inside a navigation controller unless no hierarchy is required in your definition.
@@ -92,8 +93,8 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
         let dataStore = UserDefaults.standard
         quickInit(settings: settings, datastore: dataStore)
-        let root = GroupSetting(title:"Settings Example", children:settings, footer:nil)
-        let vc = SettingsViewController(root: root, delegate: self, dataStore: dataStore)
+        let root = QSGroupSetting(title:"Settings Example", children:settings, footer:"These are all of the settings at the top level")
+        let vc = QSSettingsViewController(root: root, delegate: self, dataStore: dataStore)
         let nav = UINavigationController(rootViewController: vc)
         window?.rootViewController = nav
         
@@ -104,14 +105,15 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 To be notified of changes:
 
 ```swift
-extension AppDelegate : SettingsViewControllerDelegate {
-    func settingsViewController(vc: SettingsViewController, didUpdateSetting id: String) {
+extension AppDelegate : QSSettingsViewControllerDelegate {
+    func settingsViewController(vc: QSSettingsViewController, didUpdateSetting id: String) {
         
     }
 }
 ```
 
 ![Alt text](/screenshots/example1.png?raw=true "Example 1" | width=300)
+![Alt text](/screenshots/example2.png?raw=true "Example 1" | width=300)
 
 ## Using a Custom Data Store
 

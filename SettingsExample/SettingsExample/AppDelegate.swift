@@ -20,20 +20,19 @@ enum Speed : String {
     case Fastest
 }
 
-let speedOptions = QSEnumSettingsOptions<Speed>(defaultValue:.Fastest)
-let dogOptions = QSEnumSettingsOptions<Dogs>(defaultValue:.Lady)
-
 let settings = [
     QSGroup(title:"General", children:[
         QSToggle(label:"Foo", id:"general.foo", defaultValue:true),
         QSInfo(label: "Bar Info", text: "this is what bar is"),
-        QSSelect(label:"Bar2", id:"general.bar2", options:dogOptions),
+        QSSelect(label:"Bar2", id:"general.bar2",
+                 options:QSEnumSettingsOptions<Dogs>(defaultValue:.Lady)),
         QSText(label:"Baz", id:"general.baz", defaultValue:"Saskatoon"),
     ], footer:"This is a great section for adding lots of random settings that are not really necessary."),
     
     QSText(label:"Info", id:"general.info", defaultValue:"Swing"),
     
-    QSSelect(label:"How fast?", id:"speed", options:speedOptions),
+    QSSelect(label:"How fast?", id:"speed",
+             options:QSEnumSettingsOptions<Speed>(defaultValue:.Fastest)),
     
     QSToggle(label:"Should I?", id:"general.shouldi", defaultValue:true),
     
@@ -44,7 +43,7 @@ let settings = [
         
         QSGroup(title:"SubGroup", children:[
             QSToggle(label:"SubFoo", id:"extra.subfoo", defaultValue:false),
-        ])
+            ], footer:"This is a subgroup showing how the definition is recursive")
         
     ])
 ]

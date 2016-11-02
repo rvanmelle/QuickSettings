@@ -25,7 +25,8 @@ class QSSettingsOptionsViewController: QSSettingsBaseViewController {
         self.selected = selected
         self.options = options
         self.optionKey = key
-        super.init(nibName: nil, bundle: nil)
+        //super.init(nibName: nil, bundle: nil)
+        super.init(style: .grouped)
         self.delegate = delegate
         
     }
@@ -42,8 +43,8 @@ class QSSettingsOptionsViewController: QSSettingsBaseViewController {
     
 }
 
-extension QSSettingsOptionsViewController : UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+extension QSSettingsOptionsViewController {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath)
         selected = cell!.textLabel!.text!
         delegate?.settingsOptionsViewController(vc: self, didSelect: selected, for: optionKey)
@@ -51,17 +52,13 @@ extension QSSettingsOptionsViewController : UITableViewDelegate {
     }
 }
 
-extension QSSettingsOptionsViewController : UITableViewDataSource {
+extension QSSettingsOptionsViewController  {
     
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return options.options.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
         let val = options.options[indexPath.row]
         cell.textLabel?.text = val

@@ -11,17 +11,28 @@ import Foundation
 
 // Base Class
 
-public class QSSettingsBaseViewController: UIViewController {
+public class QSSettingsBaseViewController: UITableViewController {
     
-    let tableView = UITableView(frame: CGRect.zero, style: .grouped)
+    //let tableView = UITableView(frame: CGRect.zero, style: .grouped)
     
     override public func viewDidLoad() {
         super.viewDidLoad()
-        tableView.translatesAutoresizingMaskIntoConstraints = false
+        
         QSSettingsTableCell.register(tableView)
         QSSettingsTextTableCell.register(tableView)
-        view.addSubview(tableView)
-        view.pinItemFillAll(tableView)
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(singleTapHandler(gesture:)))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+        
+        //tableView.translatesAutoresizingMaskIntoConstraints = false
+        //view.addSubview(tableView)
+        //view.pinItemFillAll(tableView)
+    }
+    
+    @objc
+    fileprivate func singleTapHandler(gesture: UITapGestureRecognizer) {
+        view.endEditing(true)
     }
     
 }
@@ -52,7 +63,8 @@ public class QSSettingsViewController: QSSettingsBaseViewController {
     public init(root:QSGroupSetting, delegate:QSSettingsViewControllerDelegate, dataStore:QSSettingsDataSource = UserDefaults.standard) {
         self.defaultsStore = dataStore
         self.root = root
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .grouped)
+        //super.init(nibName: nil, bundle: nil)
         self.delegate = delegate
     }
     
@@ -126,7 +138,7 @@ extension QSSettingsViewController : QSSettingsOptionsViewControllerDelegate {
     }
 }
 
-extension QSSettingsViewController : UITableViewDelegate {
+extension QSSettingsViewController  {
     
     private func navigateToSelect(options:QSSettingsOptions, label:String, key:String, value:String) {
         let optionsVC = QSSettingsOptionsViewController(options: options, key:key, selected:value, delegate: self)
@@ -139,7 +151,7 @@ extension QSSettingsViewController : UITableViewDelegate {
         navigationController?.pushViewController(optionsVC, animated: true)
     }
     
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
         let item = setting(for: indexPath.section)
@@ -168,12 +180,12 @@ extension QSSettingsViewController : UITableViewDelegate {
     }
 }
 
-extension QSSettingsViewController : UITableViewDataSource {
-    public func numberOfSections(in tableView: UITableView) -> Int {
+extension QSSettingsViewController {
+    public override func numberOfSections(in tableView: UITableView) -> Int {
         return numberOfGroups
     }
     
-    public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    public override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         let item = setting(for: section)
         switch item {
         case let .Group(g):
@@ -185,7 +197,7 @@ extension QSSettingsViewController : UITableViewDataSource {
         }
     }
     
-    public func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+    public override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         let item = setting(for: section)
         switch item {
         case let .Group(g):
@@ -196,7 +208,7 @@ extension QSSettingsViewController : UITableViewDataSource {
 
     }
     
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let item = setting(for: section)
         switch item {
         case let .Group(g):
@@ -296,7 +308,7 @@ extension QSSettingsViewController : UITableViewDataSource {
 
     }
     
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let item = setting(for: indexPath.section)
         
