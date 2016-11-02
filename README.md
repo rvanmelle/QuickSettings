@@ -92,7 +92,7 @@ To use, simply declare a SettingsViewController, typically inside a navigation c
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
         let dataStore = UserDefaults.standard
-        quickInit(settings: settings, datastore: dataStore)
+        QSInit(settings: settings, datastore: dataStore)
         let root = QSGroupSetting(title:"Settings Example", children:settings, footer:"These are all of the settings at the top level")
         let vc = QSSettingsViewController(root: root, delegate: self, dataStore: dataStore)
         let nav = UINavigationController(rootViewController: vc)
@@ -117,10 +117,10 @@ extension AppDelegate : QSSettingsViewControllerDelegate {
 
 ## Using a Custom Data Store
 
-You can pass in any datastore that conforms to the SettingsDataSource protocol:
+You can pass in any datastore that conforms to the QSSettingsDataSource protocol:
 
 ```swift
-public protocol SettingsDataSource {
+public protocol QSSettingsDataSource {
     
     func bool(forKey:String) -> Bool
     func float(forKey:String) -> Float
