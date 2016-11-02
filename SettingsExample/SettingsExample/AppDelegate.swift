@@ -53,7 +53,6 @@ let settings = [
                 QSText(label: "Int", id: "extra.int", defaultValue: nil, type:.int)
             ])
             ], footer:"This is a subgroup showing how the definition is recursive")
-        
     ])
 ]
 

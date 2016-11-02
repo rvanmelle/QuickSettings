@@ -66,16 +66,25 @@ let settings = [
     
     QSToggle(label:"Should I?", id:"general.shouldi", defaultValue:true),
     
-    QSGroup(title:"Extra", children:[
+	    QSGroup(title:"Extra", children:[
         QSToggle(label:"Foo", id:"extra.foo", defaultValue:false),
         QSToggle(label:"Bar", id:"extra.bar", defaultValue:true),
         QSText(label:"Baz", id:"extra.baz", defaultValue:"TomTom"),
         
         QSGroup(title:"SubGroup", children:[
             QSToggle(label:"SubFoo", id:"extra.subfoo", defaultValue:false),
+            QSGroup(title: "Text Fields", children: [
+                QSText(label: "Password", id: "extra.password", defaultValue: nil, type:.password),
+                QSText(label: "Email", id: "extra.email", defaultValue: nil, type:.email),
+                QSText(label: "Phone", id: "extra.phone", defaultValue: nil, type:.phone),
+                QSText(label: "URL", id: "extra.url", defaultValue: nil, type:.url),
+                QSText(label: "Decimal", id: "extra.decimal", defaultValue: nil, type:.decimal),
+                QSText(label: "Name", id: "extra.name", defaultValue: nil, type:.name),
+                QSText(label: "Int", id: "extra.int", defaultValue: nil, type:.int)
+            ])
             ], footer:"This is a subgroup showing how the definition is recursive")
-        
     ])
+
 ]
 ```
 
@@ -87,7 +96,7 @@ QSInit(settings: settings, datastore: dataStore)
 QSReset(settings: settings, dataStore: dataStore)
 ```
 
-To use, simply declare a SettingsViewController, typically inside a navigation controller unless no hierarchy is required in your definition.
+To use, simply declare a QSSettingsViewController, typically inside a navigation controller unless no hierarchy is required in your definition.
 
 ```swift
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
