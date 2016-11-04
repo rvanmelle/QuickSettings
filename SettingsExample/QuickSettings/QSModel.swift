@@ -54,30 +54,22 @@ private func iterateEnum<T: Hashable>(_: T.Type) -> AnyIterator<T> {
 // http://nshipster.com/swift-documentation/
 // http://useyourloaf.com/blog/swift-documentation-quick-guide/
 
-/**
- Initializes the dataStore to fill in any missing values with defaults.
- - parameter settings: the settings to be initialized
- - parameter datastore: the conforming datastore to be initialized
- - important: THIS WILL NOT OVERWRITE EXISTING VALUES
- */
-public func QSInit(settings:[QSSettable], datastore : QSSettingsDataSource) {
-    for s in settings { s.initialize(datastore) }
-}
-
-/**
- Initializes the dataStore to fill in any missing values with defaults.
- - parameter settings: the settings to be initialized
- - parameter datastore: the conforming datastore to be initialized
- - Warning: DESTRUCTIVE OPERATION -- this will overwrite existing data with defaults
- */
-public func QSReset(settings:[QSSettable], datastore : QSSettingsDataSource) {
-    for s in settings { s.reset(datastore) }
-}
-
 public protocol QSSettable {
+    
+    /**
+     Resets/overwrite all of the settings with default values.
+     - parameter dataSource: the conforming datastore to be initialized
+     - Warning: DESTRUCTIVE OPERATION -- this will overwrite existing data with defaults
+     */
+    
     func reset(_ dataSource:QSSettingsDataSource)
+    /**
+     Initializes the dataStore to fill in any missing values with defaults.
+     - parameter dataSource: the conforming datastore to be initialized
+     - important: THIS WILL NOT OVERWRITE EXISTING VALUES
+     */
     func initialize(_ dataSource:QSSettingsDataSource)
-    func settingForId(target:String) -> QSSettable?
+    func setting(for key:String) -> QSSettable?
     
     var uniqueId : String? { get }
 }
@@ -98,7 +90,7 @@ public struct QSInfo : QSSettable {
     }
     public func reset(_ dataSource:QSSettingsDataSource) {}
     public func initialize(_ dataSource:QSSettingsDataSource) {}
-    public func settingForId(target: String) -> QSSettable? { return nil }
+    public func setting(for key: String) -> QSSettable? { return nil }
     public var uniqueId: String? { return nil }
 }
 
@@ -126,7 +118,7 @@ public struct QSToggle : QSSettable  {
     
     public func reset(_ dataSource:QSSettingsDataSource) {}
     public func initialize(_ dataSource:QSSettingsDataSource) {}
-    public func settingForId(target: String) -> QSSettable? { return key == target ? self : nil }
+    public func setting(for _key: String) -> QSSettable? { return key == _key ? self : nil }
     public var uniqueId: String? { return key }
 }
 
@@ -206,7 +198,7 @@ public struct QSText : QSSettable  {
     public func initialize(_ dataSource:QSSettingsDataSource) {
         if !dataSource.hasValue(forKey: key) { reset(dataSource) }
     }
-    public func settingForId(target: String) -> QSSettable? { return key == target ? self : nil }
+    public func setting(for _key: String) -> QSSettable? { return key == _key ? self : nil }
     public var uniqueId: String? { return key }
 }
 
@@ -240,7 +232,7 @@ public struct QSSlider : QSSettable  {
     public func initialize(_ dataSource:QSSettingsDataSource) {
         if !dataSource.hasValue(forKey: key) { reset(dataSource) }
     }
-    public func settingForId(target: String) -> QSSettable? { return key == target ? self : nil }
+    public func setting(for _key: String) -> QSSettable? { return key == _key ? self : nil }
     public var uniqueId: String? { return key }
 }
 
@@ -262,15 +254,6 @@ public struct QSGroup : QSSettable  {
         self.footer = footer
     }
     
-    internal func setting(for key:String) -> QSSettable? {
-        for c in children {
-            if let s = c.settingForId(target: key) {
-                return s
-            }
-        }
-        return nil
-    }
-    
     public func reset(_ dataSource:QSSettingsDataSource) {
         for c in children {
             c.reset(dataSource)
@@ -281,9 +264,9 @@ public struct QSGroup : QSSettable  {
             c.initialize(dataSource)
         }
     }
-    public func settingForId(target: String) -> QSSettable? {
+    public func setting(for key: String) -> QSSettable? {
         for c in children {
-            if let _ = c.settingForId(target:target) { return c }
+            if let _ = c.setting(for:key) { return c }
         }
         return nil
     }
@@ -327,7 +310,7 @@ public struct QSSelect : QSSettable  {
     public func initialize(_ dataSource:QSSettingsDataSource) {
         if !dataSource.hasValue(forKey: key) { reset(dataSource) }
     }
-    public func settingForId(target: String) -> QSSettable? { return key == target ? self : nil }
+    public func setting(for _key: String) -> QSSettable? { return key == _key ? self : nil }
     public var uniqueId: String? { return key }
 }
 
