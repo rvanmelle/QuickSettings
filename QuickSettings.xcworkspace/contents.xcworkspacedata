@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:Reflection.playground">
+   </FileRef>
+   <FileRef
       location = "group:Settings.playground">
    </FileRef>
    <FileRef
