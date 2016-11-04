@@ -20,37 +20,37 @@ enum Speed : String {
     case Fastest
 }
 
-let settings = [
+let settings : [QSSettable] = [
     QSGroup(title:"General", children:[
-        QSToggle(label:"Foo", id:"general.foo", defaultValue:true),
+        QSToggle(label:"Foo", key:"general.foo", defaultValue:true),
         QSInfo(label: "Bar Info", text: "this is what bar is"),
-        QSSelect(label:"Bar2", id:"general.bar2",
+        QSSelect(label:"Bar2", key:"general.bar2",
                  options:QSEnumSettingsOptions<Dogs>(defaultValue:.Lady)),
-        QSText(label:"Baz", id:"general.baz", defaultValue:"Saskatoon"),
+        QSText(label:"Baz", key:"general.baz", defaultValue:"Saskatoon"),
     ], footer:"This is a great section for adding lots of random settings that are not really necessary."),
     
-    QSText(label:"Info", id:"general.info", defaultValue:"Swing"),
+    QSText(label:"Info", key:"general.info", defaultValue:"Swing"),
     
-    QSSelect(label:"How fast?", id:"speed",
+    QSSelect(label:"How fast?", key:"speed",
              options:QSEnumSettingsOptions<Speed>(defaultValue:.Fastest)),
     
-    QSToggle(label:"Should I?", id:"general.shouldi", defaultValue:true),
+    QSToggle(label:"Should I?", key:"general.shouldi", defaultValue:true),
     
     QSGroup(title:"Extra", children:[
-        QSToggle(label:"Foo", id:"extra.foo", defaultValue:false),
-        QSToggle(label:"Bar", id:"extra.bar", defaultValue:true),
-        QSText(label:"Baz", id:"extra.baz", defaultValue:"TomTom"),
+        QSToggle(label:"Foo", key:"extra.foo", defaultValue:false),
+        QSToggle(label:"Bar", key:"extra.bar", defaultValue:true),
+        QSText(label:"Baz", key:"extra.baz", defaultValue:"TomTom"),
         
         QSGroup(title:"SubGroup", children:[
-            QSToggle(label:"SubFoo", id:"extra.subfoo", defaultValue:false),
+            QSToggle(label:"SubFoo", key:"extra.subfoo", defaultValue:false),
             QSGroup(title: "Text Fields", children: [
-                QSText(label: "Password", id: "extra.password", defaultValue: nil, type:.password),
-                QSText(label: "Email", id: "extra.email", defaultValue: nil, type:.email),
-                QSText(label: "Phone", id: "extra.phone", defaultValue: nil, type:.phone),
-                QSText(label: "URL", id: "extra.url", defaultValue: nil, type:.url),
-                QSText(label: "Decimal", id: "extra.decimal", defaultValue: nil, type:.decimal),
-                QSText(label: "Name", id: "extra.name", defaultValue: nil, type:.name),
-                QSText(label: "Int", id: "extra.int", defaultValue: nil, type:.int)
+                QSText(label: "Password", key: "extra.password", defaultValue: nil, type:.password),
+                QSText(label: "Email", key: "extra.email", defaultValue: nil, type:.email),
+                QSText(label: "Phone", key: "extra.phone", defaultValue: nil, type:.phone),
+                QSText(label: "URL", key: "extra.url", defaultValue: nil, type:.url),
+                QSText(label: "Decimal", key: "extra.decimal", defaultValue: nil, type:.decimal),
+                QSText(label: "Name", key: "extra.name", defaultValue: nil, type:.name),
+                QSText(label: "Int", key: "extra.int", defaultValue: nil, type:.int)
             ])
             ], footer:"This is a subgroup showing how the definition is recursive")
     ])
@@ -67,7 +67,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let dataStore = UserDefaults.standard
         QSInit(settings: settings, datastore: dataStore)
-        let root = QSGroupSetting(title:"Settings Example", children:settings, footer:"Made with a moderate amount of love by a developer who just wants to get stuff done. This library can be used freely without credit.")
+        let root = QSGroup(title:"Settings Example", children:settings, footer:"Made with a moderate amount of love by a developer who just wants to get stuff done. This library can be used freely without credit.")
         let vc = QSSettingsViewController(root: root, delegate: self, dataStore: dataStore)
         let nav = UINavigationController(rootViewController: vc)
         window?.rootViewController = nav

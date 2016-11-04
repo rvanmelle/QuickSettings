@@ -48,7 +48,7 @@ public class QSSettingsViewController: QSSettingsBaseViewController {
     
     weak var delegate : QSSettingsViewControllerDelegate?
     
-    public var root = QSGroupSetting(title: "Settings", children: [], footer:nil)
+    public var root = QSGroup(title: "Settings", children: [], footer:nil)
     public var defaultsStore : QSSettingsDataSource = UserDefaults.standard
     
     private var footerLabel : UILabel?
@@ -60,7 +60,7 @@ public class QSSettingsViewController: QSSettingsBaseViewController {
      - parameter delegate: Delegate to be notified of changes
      - parameter dataStore: The datastore where settings will be read/written to. Defaults = UserDefaults.standard
      */
-    public init(root:QSGroupSetting, delegate:QSSettingsViewControllerDelegate, dataStore:QSSettingsDataSource = UserDefaults.standard) {
+    public init(root:QSGroup, delegate:QSSettingsViewControllerDelegate, dataStore:QSSettingsDataSource = UserDefaults.standard) {
         self.defaultsStore = dataStore
         self.root = root
         super.init(style: .grouped)
@@ -72,7 +72,7 @@ public class QSSettingsViewController: QSSettingsBaseViewController {
         fatalError()
     }
     
-    fileprivate func setting(for section:Int) -> QSSetting {
+    fileprivate func setting(for section:Int) -> QSSettable {
         return root.children[section]
     }
     
@@ -146,7 +146,7 @@ extension QSSettingsViewController  {
         navigationController?.pushViewController(optionsVC, animated: true)
     }
     
-    private func navigateToGroup(subRoot:QSGroupSetting) {
+    private func navigateToGroup(subRoot:QSGroup) {
         let optionsVC = QSSettingsViewController(root: subRoot, delegate: delegate!, dataStore: defaultsStore)
         navigationController?.pushViewController(optionsVC, animated: true)
     }
@@ -156,19 +156,19 @@ extension QSSettingsViewController  {
         
         let item = setting(for: indexPath.section)
         switch item {
-        case let .Group(g):
+        case let g as QSGroup:
             let subSetting = g.children[indexPath.row]
             switch subSetting {
-            case let .Select(s):
+            case let s as QSSelect:
                 let currentValue = s.value(from: defaultsStore)
                 navigateToSelect(options: s.options, label:s.label, key:s.key, value:currentValue!)
-            case let .Group(g):
+            case let g as QSGroup:
                 navigateToGroup(subRoot: g)
             default:
                 break
             }
 
-        case let .Select(s):
+        case let s as QSSelect:
             let newValue = s.options.options[indexPath.row]
             defaultsStore.set(newValue, forKey: s.key)
             delegate?.settingsViewController(vc: self, didUpdateSetting: s.key)
@@ -188,9 +188,9 @@ extension QSSettingsViewController {
     public override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         let item = setting(for: section)
         switch item {
-        case let .Group(g):
+        case let g as QSGroup:
             return g.title
-        case let .Select(s):
+        case let s as QSSelect:
             return s.label
         default:
             return nil
@@ -200,7 +200,7 @@ extension QSSettingsViewController {
     public override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         let item = setting(for: section)
         switch item {
-        case let .Group(g):
+        case let g as QSGroup:
             return g.footer
         default:
             return nil
@@ -211,10 +211,10 @@ extension QSSettingsViewController {
     public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let item = setting(for: section)
         switch item {
-        case let .Group(g):
+        case let g as QSGroup:
             return g.children.count
 
-        case let .Select(s):
+        case let s as QSSelect:
             return s.options.options.count
         default:
             return 1
@@ -229,7 +229,7 @@ extension QSSettingsViewController {
         }
     }
     
-    private func configureTextCell(cell:QSSettingsTextTableCell, setting:QSTextSetting) {
+    private func configureTextCell(cell:QSSettingsTextTableCell, setting:QSText) {
         cell.textLabel?.text = setting.label
         cell.field.restorationIdentifier = setting.key
         cell.field.delegate = self
@@ -237,7 +237,7 @@ extension QSSettingsViewController {
         cell.textType = setting.type
     }
     
-    private func configureToggleCell(cell:QSSettingsTableCell, setting:QSToggleSetting) {
+    private func configureToggleCell(cell:QSSettingsTableCell, setting:QSToggle) {
         cell.textLabel?.text = setting.label
         cell.detailTextLabel?.text = nil
         let s = UISwitch()
@@ -247,23 +247,23 @@ extension QSSettingsViewController {
         cell.accessoryView = s
     }
     
-    private func configureSelectDisclosureCell(cell:QSSettingsTableCell, setting:QSSelectSetting) {
+    private func configureSelectDisclosureCell(cell:QSSettingsTableCell, setting:QSSelect) {
         cell.textLabel?.text = setting.label
         cell.detailTextLabel?.text = setting.value(from: defaultsStore)
         cell.accessoryType = .disclosureIndicator
     }
     
-    private func configureInfoCell(cell:QSSettingsTableCell, setting:QSInfoSetting) {
+    private func configureInfoCell(cell:QSSettingsTableCell, setting:QSInfo) {
         cell.textLabel?.text = setting.label
         cell.detailTextLabel?.text = setting.text
     }
     
-    private func configureGroupCell(cell:QSSettingsTableCell, setting:QSGroupSetting) {
+    private func configureGroupCell(cell:QSSettingsTableCell, setting:QSGroup) {
         cell.textLabel?.text = setting.title
         cell.accessoryType = .disclosureIndicator
     }
     
-    private func configureSelectOptionCell(cell:QSSettingsTableCell, setting:QSSelectSetting, index:Int) {
+    private func configureSelectOptionCell(cell:QSSettingsTableCell, setting:QSSelect, index:Int) {
         let options = setting.options.options
         let valueToDisplay = options[index]
         cell.textLabel?.text = valueToDisplay
@@ -271,10 +271,10 @@ extension QSSettingsViewController {
         cell.accessoryType = (valueToDisplay == currentValue) ? .checkmark : .none
     }
     
-    private func settingCell(from tableView:UITableView, for setting:QSSetting, atTopLevel:Bool, forRowAt indexPath : IndexPath) -> UITableViewCell {
+    private func settingCell(from tableView:UITableView, for setting:QSSettable, atTopLevel:Bool, forRowAt indexPath : IndexPath) -> UITableViewCell {
         switch setting {
             
-        case let .Select(s):
+        case let s as QSSelect:
             let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
             if atTopLevel {
                 configureSelectOptionCell(cell: cell, setting: s, index: indexPath.row)
@@ -283,27 +283,29 @@ extension QSSettingsViewController {
             }
             return cell
             
-        case let .Text(t):
+        case let t as QSText:
             let cell = QSSettingsTextTableCell.dequeue(tableView, for: indexPath)
             configureTextCell(cell: cell, setting: t)
             return cell
             
-        case let .Toggle(t):
+        case let t as QSToggle:
             let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
             configureToggleCell(cell: cell, setting: t)
             return cell
             
-        case let .Info(i):
+        case let i as QSInfo:
             let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
             configureInfoCell(cell: cell, setting: i)
             return cell
             
-        case let .Group(g):
+        case let g as QSGroup:
             let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
             configureGroupCell(cell: cell, setting: g)
             return cell
             
-        case .Slider:
+        case is QSSlider:
+            fatalError()
+        default:
             fatalError()
         }
 
@@ -315,14 +317,16 @@ extension QSSettingsViewController {
         
         switch item {
             
-        case let .Group(g):
+        case let g as QSGroup:
             let subSetting = g.children[indexPath.row]
             return settingCell(from: tableView, for: subSetting, atTopLevel: false, forRowAt: indexPath)
             
-        case .Select, .Text, .Toggle, .Info:
+        case is QSSelect, is QSText, is QSToggle, is QSInfo:
             return settingCell(from: tableView, for: item, atTopLevel: true, forRowAt: indexPath)
             
-        case .Slider:
+        case is QSSlider:
+            fatalError()
+        default:
             fatalError()
         }
         
