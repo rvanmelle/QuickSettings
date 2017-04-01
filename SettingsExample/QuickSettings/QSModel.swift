@@ -14,8 +14,8 @@ import Foundation
  displayed to the user and a defaultValue if nothing has been selected.
  */
 public protocol QSSettingsOptions {
-    var options : [String] { get }
-    var defaultValue : String { get }
+    var options: [String] { get }
+    var defaultValue: String { get }
 }
 
 /**
@@ -23,18 +23,18 @@ public protocol QSSettingsOptions {
  SettingsOptions. This allows a string enumeration to be easily used to display
  a set of options to the user.
 */
-public class QSEnumSettingsOptions<T:Hashable> : QSSettingsOptions where T : RawRepresentable, T.RawValue == String {
-    
-    private let defaultVal : T
-    public init(defaultValue:T) {
+public class QSEnumSettingsOptions<T: Hashable> : QSSettingsOptions where T: RawRepresentable, T.RawValue == String {
+
+    private let defaultVal: T
+    public init(defaultValue: T) {
         self.defaultVal = defaultValue
     }
-    
+
     public var defaultValue: String {
         return defaultVal.rawValue
     }
-    
-    public var options : [String] {
+
+    public var options: [String] {
         return Array(iterateEnum(T.self)).map { $0.rawValue }
     }
 }
@@ -55,50 +55,50 @@ private func iterateEnum<T: Hashable>(_: T.Type) -> AnyIterator<T> {
 // http://useyourloaf.com/blog/swift-documentation-quick-guide/
 
 public protocol QSSettable {
-    
+
     /**
      Resets/overwrite all of the settings with default values.
      - parameter dataSource: the conforming datastore to be initialized
      - Warning: DESTRUCTIVE OPERATION -- this will overwrite existing data with defaults
      */
-    
-    func reset(_ dataSource:QSSettingsDataSource)
+
+    func reset(_ dataSource: QSSettingsDataSource)
     /**
      Initializes the dataStore to fill in any missing values with defaults.
      - parameter dataSource: the conforming datastore to be initialized
      - important: THIS WILL NOT OVERWRITE EXISTING VALUES
      */
-    func initialize(_ dataSource:QSSettingsDataSource)
-    func setting(for key:String) -> QSSettable?
-    
-    var uniqueId : String? { get }
+    func initialize(_ dataSource: QSSettingsDataSource)
+    func setting(for key: String) -> QSSettable?
+
+    var uniqueId: String? { get }
 }
 
-public struct QSInfo : QSSettable {
-    let label : String
-    let text : String
-    
+public struct QSInfo: QSSettable {
+    let label: String
+    let text: String
+
     /**
      Handy function to create an Info setting
      - parameter label: the info title to display to the user
      - parameter text: the text info to display to the user
      - returns: a Setting of type QSInfo
      */
-    public init(label:String, text:String) {
+    public init(label: String, text: String) {
         self.label = label
         self.text = text
     }
-    public func reset(_ dataSource:QSSettingsDataSource) {}
-    public func initialize(_ dataSource:QSSettingsDataSource) {}
+    public func reset(_ dataSource: QSSettingsDataSource) {}
+    public func initialize(_ dataSource: QSSettingsDataSource) {}
     public func setting(for key: String) -> QSSettable? { return nil }
     public var uniqueId: String? { return nil }
 }
 
-public struct QSToggle : QSSettable  {
-    let label : String
-    let key : String
-    let defaultValue : Bool
-    
+public struct QSToggle: QSSettable {
+    let label: String
+    let key: String
+    let defaultValue: Bool
+
     /**
      Create a Toggle setting
      - parameter label: the string to display to the user
@@ -111,18 +111,18 @@ public struct QSToggle : QSSettable  {
         self.key = key
         self.defaultValue = defaultValue
     }
-    
-    internal func value(from dataSource:QSSettingsDataSource) -> Bool {
+
+    internal func value(from dataSource: QSSettingsDataSource) -> Bool {
         return dataSource.hasValue(forKey: key) ? dataSource.bool(forKey: key) : defaultValue
     }
-    
-    public func reset(_ dataSource:QSSettingsDataSource) {}
-    public func initialize(_ dataSource:QSSettingsDataSource) {}
-    public func setting(for _key: String) -> QSSettable? { return key == _key ? self : nil }
+
+    public func reset(_ dataSource: QSSettingsDataSource) {}
+    public func initialize(_ dataSource: QSSettingsDataSource) {}
+    public func setting(for settingKey: String) -> QSSettable? { return key == settingKey ? self : nil }
     public var uniqueId: String? { return key }
 }
 
-public enum QSTextSettingType  {
+public enum QSTextSettingType {
     case text
     case name
     case url
@@ -131,22 +131,21 @@ public enum QSTextSettingType  {
     case password
     case email
     case decimal
-    
-    
-    var autocorrection : UITextAutocorrectionType {
+
+    var autocorrection: UITextAutocorrectionType {
         switch self {
         case .text: return .yes
         case .decimal, .email, .int, .name, .password, .phone, .url: return .no
         }
     }
-    var autocapitalization : UITextAutocapitalizationType {
+    var autocapitalization: UITextAutocapitalizationType {
         switch self {
         case .text, .decimal, .email, .int, .password, .phone, .url: return .none
         case .name: return .words
         }
     }
-    
-    var keyboard : UIKeyboardType {
+
+    var keyboard: UIKeyboardType {
         switch self {
         case .text: return .default
         case .decimal: return .decimalPad
@@ -158,22 +157,22 @@ public enum QSTextSettingType  {
         case .url: return .URL
         }
     }
-    
-    var secure : Bool {
+
+    var secure: Bool {
         switch self {
         case .password: return true
         case .text, .decimal, .email, .int, .name, .phone, .url: return false
         }
     }
-    
+
 }
 
-public struct QSText : QSSettable  {
-    let label : String
-    let key : String
-    let defaultValue : String?
-    let type : QSTextSettingType
-    
+public struct QSText: QSSettable {
+    let label: String
+    let key: String
+    let defaultValue: String?
+    let type: QSTextSettingType
+
     /**
      Handy function to create a Text setting
      - parameter label: the string to display to the user
@@ -181,34 +180,34 @@ public struct QSText : QSSettable  {
      - parameter defaultValue: value to be used if none has been set
      - returns: a Setting of type QSText
      */
-    public init(label: String, key: String, defaultValue: String?, type:QSTextSettingType = .text) {
+    public init(label: String, key: String, defaultValue: String?, type: QSTextSettingType = .text) {
         self.label = label
         self.key = key
         self.defaultValue = defaultValue
         self.type = type
     }
-    
-    internal func value(from dataSource:QSSettingsDataSource) -> String? {
+
+    internal func value(from dataSource: QSSettingsDataSource) -> String? {
         return dataSource.hasValue(forKey: key) ? dataSource.string(forKey: key) : defaultValue
     }
-    
-    public func reset(_ dataSource:QSSettingsDataSource) {
+
+    public func reset(_ dataSource: QSSettingsDataSource) {
         dataSource.set(defaultValue, forKey: key)
     }
-    public func initialize(_ dataSource:QSSettingsDataSource) {
+    public func initialize(_ dataSource: QSSettingsDataSource) {
         if !dataSource.hasValue(forKey: key) { reset(dataSource) }
     }
-    public func setting(for _key: String) -> QSSettable? { return key == _key ? self : nil }
+    public func setting(for settingKey: String) -> QSSettable? { return key == settingKey ? self : nil }
     public var uniqueId: String? { return key }
 }
 
-public struct QSSlider : QSSettable  {
-    let label : String
-    let key : String
-    let min : Float
-    let max : Float
-    let defaultValue : Float
-    
+public struct QSSlider: QSSettable {
+    let label: String
+    let key: String
+    let min: Float
+    let max: Float
+    let defaultValue: Float
+
     /**
      Handy function to create a Slider setting
      - parameter label: the string to display to the user
@@ -218,29 +217,29 @@ public struct QSSlider : QSSettable  {
      - parameter defaultValue: value to be used if none has been set
      - returns: a Setting of type QSSlider
      */
-    public init(label: String, key: String, min:Float, max:Float, defaultValue: Float) {
+    public init(label: String, key: String, min: Float, max: Float, defaultValue: Float) {
         self.label = label
         self.key = key
         self.min = min
         self.max = max
         self.defaultValue = defaultValue
     }
-    
-    public func reset(_ dataSource:QSSettingsDataSource) {
+
+    public func reset(_ dataSource: QSSettingsDataSource) {
         dataSource.set(defaultValue, forKey: key)
     }
-    public func initialize(_ dataSource:QSSettingsDataSource) {
+    public func initialize(_ dataSource: QSSettingsDataSource) {
         if !dataSource.hasValue(forKey: key) { reset(dataSource) }
     }
-    public func setting(for _key: String) -> QSSettable? { return key == _key ? self : nil }
+    public func setting(for settingKey: String) -> QSSettable? { return key == settingKey ? self : nil }
     public var uniqueId: String? { return key }
 }
 
-public struct QSGroup : QSSettable  {
-    let title : String
-    let children : [QSSettable]
-    let footer : String?
-    
+public struct QSGroup: QSSettable {
+    let title: String
+    let children: [QSSettable]
+    let footer: String?
+
     /**
      Create a Group setting
      - parameter title: the title of the group to be displayed to the user
@@ -253,13 +252,13 @@ public struct QSGroup : QSSettable  {
         self.children = children
         self.footer = footer
     }
-    
-    public func reset(_ dataSource:QSSettingsDataSource) {
+
+    public func reset(_ dataSource: QSSettingsDataSource) {
         for c in children {
             c.reset(dataSource)
         }
     }
-    public func initialize(_ dataSource:QSSettingsDataSource) {
+    public func initialize(_ dataSource: QSSettingsDataSource) {
         for c in children {
             c.initialize(dataSource)
         }
@@ -273,11 +272,11 @@ public struct QSGroup : QSSettable  {
     public var uniqueId: String? { return nil }
 }
 
-public struct QSSelect : QSSettable  {
-    let label : String
-    let key : String
-    let options : QSSettingsOptions
-    
+public struct QSSelect: QSSettable {
+    let label: String
+    let key: String
+    let options: QSSettingsOptions
+
     /**
      Create a Select setting
      - parameter label: the string to display to the user
@@ -285,13 +284,13 @@ public struct QSSelect : QSSettable  {
      - parameter options: an object conforming to SettingsOptions
      - returns: a Setting of type QSSelect
      */
-    public init(label: String, key: String, options:QSSettingsOptions) {
+    public init(label: String, key: String, options: QSSettingsOptions) {
         self.label = label
         self.key = key
         self.options = options
     }
-    
-    internal func value(from dataSource:QSSettingsDataSource) -> String? {
+
+    internal func value(from dataSource: QSSettingsDataSource) -> String? {
         if dataSource.hasValue(forKey: key) {
             let proposedValue = dataSource.string(forKey: key)!
             if options.options.contains(proposedValue) {
@@ -303,30 +302,29 @@ public struct QSSelect : QSSettable  {
             return options.defaultValue
         }
     }
-    
-    public func reset(_ dataSource:QSSettingsDataSource) {
+
+    public func reset(_ dataSource: QSSettingsDataSource) {
         dataSource.set(options.defaultValue, forKey: key)
     }
-    public func initialize(_ dataSource:QSSettingsDataSource) {
+    public func initialize(_ dataSource: QSSettingsDataSource) {
         if !dataSource.hasValue(forKey: key) { reset(dataSource) }
     }
-    public func setting(for _key: String) -> QSSettable? { return key == _key ? self : nil }
+    public func setting(for settingKey: String) -> QSSettable? { return key == settingKey ? self : nil }
     public var uniqueId: String? { return key }
 }
 
 public protocol QSSettingsDataSource {
-    
-    func bool(forKey:String) -> Bool
-    func float(forKey:String) -> Float
-    func integer(forKey:String) -> Int
-    func string(forKey:String) -> String?
-    func hasValue(forKey:String) -> Bool
-    
-    func set(_ value:Bool, forKey:String)
-    func set(_ value:Float, forKey:String)
-    func set(_ value:Any?, forKey:String)
-}
 
+    func bool(forKey: String) -> Bool
+    func float(forKey: String) -> Float
+    func integer(forKey: String) -> Int
+    func string(forKey: String) -> String?
+    func hasValue(forKey: String) -> Bool
+
+    func set(_ value: Bool, forKey: String)
+    func set(_ value: Float, forKey: String)
+    func set(_ value: Any?, forKey: String)
+}
 
 /**
  Make user defaults conform to the SettingsDataSource protocol
@@ -340,4 +338,3 @@ extension UserDefaults : QSSettingsDataSource {
         }
     }
 }
-

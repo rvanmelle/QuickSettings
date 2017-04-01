@@ -8,28 +8,31 @@
 
 import Foundation
 
-class QSSettingsTableCell : UITableViewCell {
-    
+class QSSettingsTableCell: UITableViewCell {
+
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
-    
-    class func dequeue(_ tableView:UITableView, for indexPath:IndexPath) -> QSSettingsTableCell {
-        return tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! QSSettingsTableCell
+
+    class func dequeue(_ tableView: UITableView, for indexPath: IndexPath) -> QSSettingsTableCell {
+        guard let tbc = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as? QSSettingsTableCell else {
+            fatalError()
+        }
+        return tbc
     }
-    
-    class func register(_ tableView:UITableView) {
+
+    class func register(_ tableView: UITableView) {
         tableView.register(self, forCellReuseIdentifier: reuseIdentifier)
     }
-    
+
     static var reuseIdentifier: String {
         return "SettingsTableCell"
     }
-    
+
     override func prepareForReuse() {
         super.prepareForReuse()
         accessoryType = .none
@@ -39,11 +42,11 @@ class QSSettingsTableCell : UITableViewCell {
     }
 }
 
-class QSSettingsTextTableCell : UITableViewCell {
-    
+class QSSettingsTextTableCell: UITableViewCell {
+
     let field = UITextField()
-    
-    var textType : QSTextSettingType = .text {
+
+    var textType: QSTextSettingType = .text {
         didSet {
             field.autocorrectionType = textType.autocorrection
             field.autocapitalizationType = textType.autocapitalization
@@ -51,7 +54,7 @@ class QSSettingsTextTableCell : UITableViewCell {
             field.keyboardType = textType.keyboard
         }
     }
-    
+
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
         field.translatesAutoresizingMaskIntoConstraints = false
@@ -62,23 +65,26 @@ class QSSettingsTextTableCell : UITableViewCell {
         contentView.pinItem(field, attribute: .right, to:  contentView, toAttribute: .rightMargin)
         contentView.pinItem(field, attribute: .left, to: contentView, toAttribute: .centerX)
     }
-    
-    class func dequeue(_ tableView:UITableView, for indexPath:IndexPath) -> QSSettingsTextTableCell {
-        return tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! QSSettingsTextTableCell
+
+    class func dequeue(_ tableView: UITableView, for indexPath: IndexPath) -> QSSettingsTextTableCell {
+        guard let tbc = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as? QSSettingsTextTableCell else {
+            fatalError()
+        }
+        return tbc
     }
-    
-    class func register(_ tableView:UITableView) {
+
+    class func register(_ tableView: UITableView) {
         tableView.register(self, forCellReuseIdentifier: reuseIdentifier)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
-    
+
     static var reuseIdentifier: String {
         return "SettingsTextTableCell"
     }
-    
+
     override func prepareForReuse() {
         super.prepareForReuse()
         accessoryType = .none
@@ -89,4 +95,3 @@ class QSSettingsTextTableCell : UITableViewCell {
     }
 
 }
-
