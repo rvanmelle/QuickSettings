@@ -42,6 +42,41 @@ class QSSettingsTableCell: UITableViewCell {
     }
 }
 
+class QSSettingsActionTableCell: UITableViewCell {
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: .default, reuseIdentifier: reuseIdentifier)
+        textLabel?.textAlignment = .center
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError()
+    }
+
+    class func dequeue(_ tableView: UITableView, for indexPath: IndexPath) -> QSSettingsActionTableCell {
+        guard let tbc = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as? QSSettingsActionTableCell else {
+            fatalError()
+        }
+        return tbc
+    }
+
+    class func register(_ tableView: UITableView) {
+        tableView.register(self, forCellReuseIdentifier: reuseIdentifier)
+    }
+
+    static var reuseIdentifier: String {
+        return "SettingsActionTableCell"
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        accessoryType = .none
+        accessoryView = nil
+        textLabel?.text = nil
+        textLabel?.font = textLabel?.font.withTraits()
+        textLabel?.textColor = UIColor.black
+    }
+}
+
 class QSSettingsTextTableCell: UITableViewCell {
 
     let field = UITextField()

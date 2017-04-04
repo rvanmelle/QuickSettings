@@ -19,6 +19,7 @@ public class QSSettingsBaseViewController: UITableViewController {
 
         QSSettingsTableCell.register(tableView)
         QSSettingsTextTableCell.register(tableView)
+        QSSettingsActionTableCell.register(tableView)
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(singleTapHandler(gesture:)))
         tap.cancelsTouchesInView = false
@@ -169,6 +170,9 @@ extension QSSettingsViewController {
             delegate?.settingsViewController(settingsVc: self, didUpdateSetting: s.key)
             tableView.reloadData()
 
+        case let a as QSAction:
+            a.actionCallback()
+
         default:
             break
         }
@@ -200,7 +204,6 @@ extension QSSettingsViewController {
         default:
             return nil
         }
-
     }
 
     public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -257,6 +260,19 @@ extension QSSettingsViewController {
         cell.accessoryType = .disclosureIndicator
     }
 
+    private func configureActionCell(cell: QSSettingsActionTableCell, setting: QSAction) {
+        cell.textLabel?.text = setting.title
+        switch setting.actionType {
+        case .default:
+            cell.textLabel?.font = cell.textLabel?.font.bold()
+        case .destructive:
+            cell.textLabel?.textColor = UIColor.red
+            cell.textLabel?.font = cell.textLabel?.font.bold()
+        case .normal:
+            break
+        }
+    }
+
     private func configureSelectOptionCell(cell: QSSettingsTableCell, setting: QSSelect, index: Int) {
         let options = setting.options.options
         let valueToDisplay = options[index]
@@ -296,6 +312,11 @@ extension QSSettingsViewController {
         case let g as QSGroup:
             let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
             configureGroupCell(cell: cell, setting: g)
+            return cell
+
+        case let a as QSAction:
+            let cell = QSSettingsActionTableCell.dequeue(tableView, for: indexPath)
+            configureActionCell(cell: cell, setting: a)
             return cell
 
         case is QSSlider:

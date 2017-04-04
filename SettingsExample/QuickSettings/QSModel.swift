@@ -236,7 +236,7 @@ public struct QSSlider: QSSettable {
 }
 
 public struct QSGroup: QSSettable {
-    let title: String
+    let title: String?
     let children: [QSSettable]
     let footer: String?
 
@@ -247,10 +247,16 @@ public struct QSGroup: QSSettable {
      - parameter footer: a description string displayed underneath the group
      - returns: a Setting of type QSGroup
      */
-    public init(title: String, children: [QSSettable], footer: String? = nil) {
+    public init(title: String?, children: [QSSettable], footer: String? = nil) {
         self.title = title
         self.children = children
         self.footer = footer
+    }
+
+    public init(title: String?, footer: String?, childrenCallback: (() -> [QSSettable])) {
+        self.title = title
+        self.footer = footer
+        self.children = childrenCallback()
     }
 
     public func reset(_ dataSource: QSSettingsDataSource) {
@@ -269,6 +275,28 @@ public struct QSGroup: QSSettable {
         }
         return nil
     }
+    public var uniqueId: String? { return nil }
+}
+
+public struct QSAction: QSSettable {
+
+    public enum ActionType {
+        case normal, `default`, destructive
+    }
+    let title: String
+    let actionCallback: () -> Void
+    let actionType: ActionType
+
+    public init(title: String, actionType: ActionType = .normal, actionCallback: @escaping () -> Void) {
+        self.title = title
+        self.actionCallback = actionCallback
+        self.actionType = actionType
+    }
+
+    public func reset(_ dataSource: QSSettingsDataSource) {}
+    public func initialize(_ dataSource: QSSettingsDataSource) {}
+    public func setting(for key: String) -> QSSettable? { return nil }
+
     public var uniqueId: String? { return nil }
 }
 
