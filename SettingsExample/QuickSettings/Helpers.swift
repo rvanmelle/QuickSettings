@@ -3,12 +3,12 @@
 //  Tracker
 //
 //  Created by Reid van Melle on 2017-04-03.
-//  Copyright © 2017 Standable Inc. All rights reserved.
+//  Copyright © 2017 Reid van Melle Inc. All rights reserved.
 //
 
 import Foundation
 
-extension UIFont {
+internal extension UIFont {
 
     func withTraits(_ traits: UIFontDescriptorSymbolicTraits...) -> UIFont {
         guard let descriptor = self.fontDescriptor.withSymbolicTraits(UIFontDescriptorSymbolicTraits(traits)) else { fatalError() }

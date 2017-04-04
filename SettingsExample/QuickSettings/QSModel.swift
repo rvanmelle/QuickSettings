@@ -113,7 +113,8 @@ public struct QSToggle: QSSettable {
     }
 
     internal func value(from dataSource: QSSettingsDataSource) -> Bool {
-        return dataSource.hasValue(forKey: key) ? dataSource.bool(forKey: key) : defaultValue
+        return dataSource.hasValue(forKey: key) ? dataSource.value(forKey: key, type: Bool.self)! : defaultValue
+            //dataSource.bool(forKey: key) : defaultValue
     }
 
     public func reset(_ dataSource: QSSettingsDataSource) {}
@@ -188,10 +189,13 @@ public struct QSText: QSSettable {
     }
 
     internal func value(from dataSource: QSSettingsDataSource) -> String? {
-        return dataSource.hasValue(forKey: key) ? dataSource.string(forKey: key) : defaultValue
+        guard type != .password else { return nil }
+        return dataSource.hasValue(forKey: key) ? dataSource.value(forKey: key, type: String.self)! : defaultValue
+            //dataSource.string(forKey: key) : defaultValue
     }
 
     public func reset(_ dataSource: QSSettingsDataSource) {
+        guard type != .password else { return }
         dataSource.set(defaultValue, forKey: key)
     }
     public func initialize(_ dataSource: QSSettingsDataSource) {
@@ -320,7 +324,7 @@ public struct QSSelect: QSSettable {
 
     internal func value(from dataSource: QSSettingsDataSource) -> String? {
         if dataSource.hasValue(forKey: key) {
-            let proposedValue = dataSource.string(forKey: key)!
+            let proposedValue = dataSource.value(forKey: key, type: String.self)!
             if options.options.contains(proposedValue) {
                 return proposedValue
             } else {
@@ -341,23 +345,33 @@ public struct QSSelect: QSSettable {
     public var uniqueId: String? { return key }
 }
 
-public protocol QSSettingsDataSource {
+public protocol QSSettingsDataSource: class {
 
-    func bool(forKey: String) -> Bool
-    func float(forKey: String) -> Float
-    func integer(forKey: String) -> Int
-    func string(forKey: String) -> String?
     func hasValue(forKey: String) -> Bool
-
-    func set(_ value: Bool, forKey: String)
-    func set(_ value: Float, forKey: String)
-    func set(_ value: Any?, forKey: String)
+    func set(_ value: Any?, forKey defaultName: String)
+    func value<T>(forKey key: String, type: T.Type) -> T?
 }
 
 /**
  Make user defaults conform to the SettingsDataSource protocol
  */
 extension UserDefaults : QSSettingsDataSource {
+
+    public func value<T>(forKey key: String, type: T.Type) -> T? {
+        switch type {
+        case is String.Type:
+            return string(forKey: key) as? T
+        case is Int.Type:
+            return integer(forKey: key) as? T
+        case is Float.Type:
+            return float(forKey: key) as? T
+        case is Bool.Type:
+            return bool(forKey: key) as? T
+        default:
+            fatalError()
+        }
+    }
+
     public func hasValue(forKey key: String) -> Bool {
         if let _ = value(forKey: key) {
             return true

@@ -45,7 +45,11 @@ public class QSSettingsViewController: QSSettingsBaseViewController {
 
     weak var delegate: QSSettingsViewControllerDelegate?
 
-    public var root = QSGroup(title: "Settings", children: [], footer:nil)
+    public var root = QSGroup(title: "Settings", children: [], footer:nil) {
+        didSet {
+            tableView.reloadData()
+        }
+    }
     public var defaultsStore: QSSettingsDataSource = UserDefaults.standard
 
     private var footerLabel: UILabel?
@@ -160,6 +164,8 @@ extension QSSettingsViewController {
                 navigateToSelect(options: s.options, label:s.label, key:s.key, value:currentValue!)
             case let g as QSGroup:
                 navigateToGroup(subRoot: g)
+            case let a as QSAction:
+                a.actionCallback()
             default:
                 break
             }
@@ -226,12 +232,20 @@ extension QSSettingsViewController {
         }
     }
 
+    @objc fileprivate func textValueChanged(theField: UITextField) {
+        if let key = theField.restorationIdentifier, let _ = root.setting(for: key) {
+            defaultsStore.set(theField.text, forKey: key)
+            delegate?.settingsViewController(settingsVc: self, didUpdateSetting: key)
+        }
+    }
+
     private func configureTextCell(cell: QSSettingsTextTableCell, setting: QSText) {
         cell.textLabel?.text = setting.label
         cell.field.restorationIdentifier = setting.key
         cell.field.delegate = self
         cell.field.text = setting.value(from: defaultsStore)
         cell.textType = setting.type
+        cell.field.addTarget(self, action: #selector(textValueChanged(theField:)), for: UIControlEvents.editingDidEnd)
     }
 
     private func configureToggleCell(cell: QSSettingsTableCell, setting: QSToggle) {
