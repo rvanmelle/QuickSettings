@@ -14,8 +14,14 @@ import Foundation
  displayed to the user and a defaultValue if nothing has been selected.
  */
 public protocol QSSettingsOptions {
+
     var options: [String] { get }
     var defaultValue: String { get }
+    func description(for: String) -> String?
+}
+
+public protocol QSDescriptionEnum: Hashable {
+    var description: String? { get }
 }
 
 /**
@@ -23,7 +29,9 @@ public protocol QSSettingsOptions {
  SettingsOptions. This allows a string enumeration to be easily used to display
  a set of options to the user.
 */
-public class QSEnumSettingsOptions<T: Hashable> : QSSettingsOptions where T: RawRepresentable, T.RawValue == String {
+public class QSEnumSettingsOptions<T: Hashable> : QSSettingsOptions where T: RawRepresentable, T: QSDescriptionEnum, T.RawValue == String {
+
+    public typealias Option = T
 
     private let defaultVal: T
     public init(defaultValue: T) {
@@ -37,6 +45,11 @@ public class QSEnumSettingsOptions<T: Hashable> : QSSettingsOptions where T: Raw
     public var options: [String] {
         return Array(iterateEnum(T.self)).map { $0.rawValue }
     }
+
+    public func description(for val: String) -> String? {
+        return T(rawValue: val)?.description
+    }
+
 }
 
 private func iterateEnum<T: Hashable>(_: T.Type) -> AnyIterator<T> {

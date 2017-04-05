@@ -57,6 +57,10 @@ extension QSSettingsOptionsViewController {
         return options.options.count
     }
 
+    public override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        return options.description(for: selected)
+    }
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = QSSettingsTableCell.dequeue(tableView, for: indexPath)
         let val = options.options[indexPath.row]
