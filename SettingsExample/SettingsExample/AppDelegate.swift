@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let root = QSGroup(title: "Settings Example", children: settings,
                            footer: "Made with a moderate amount of love by a developer who just wants to get stuff done. This library can be used freely without credit.")
         root.initialize(dataStore)
-        let vc = QSSettingsViewController(root: root, delegate: self, dataStore: dataStore)
+        let vc = QSSettingsViewController(root: root, delegate: self)
         let nav = UINavigationController(rootViewController: vc)
         return nav
     }()
