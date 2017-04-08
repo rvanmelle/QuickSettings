@@ -9,93 +9,35 @@
 import UIKit
 import QuickSettings
 
-enum Dogs: String, QSDescriptionEnum {
-    case lady = "Lady"
-    case tramp = "Tramp"
-
-    var description: String? {
-        switch self {
-        case .lady: return "He/she is dignified and proper."
-        case .tramp: return "He/she is sassy and engaging."
-        }
-    }
-}
-
-enum Speed: String, QSDescriptionEnum {
-    case fast
-    case faster
-    case fastest
-    var description: String? {
-        switch self {
-        case .fastest: return "A little faster than faster"
-        default: return nil
-        }
-
-    }
-}
-
-let settings : [QSSettable] = [
-    QSGroup(title: "General", children: [
-        QSToggle(label: "Foo", key:"general.foo", defaultValue: true),
-        QSInfo(label: "Bar Info", text: "this is what bar is"),
-        QSSelect(label: "Bar2", key: "general.bar2",
-                 options:QSEnumSettingsOptions<Dogs>(defaultValue:.lady)),
-        QSText(label: "Baz", key: "general.baz", defaultValue: "Saskatoon"),
-    ], footer: "This is a great section for adding lots of random settings that are not really necessary."),
-    
-    QSText(label: "Info", key: "general.info", defaultValue: "Swing"),
-
-    QSGroup(title: "Actions", footer: nil, childrenCallback: { () -> [QSSettable] in
-        let simpleAction = QSAction(title: "Simple Action", actionCallback: {
-            print("Simple Action")
-        })
-        let destructiveAction = QSAction(title: "Reset all data", actionType: QSAction.ActionType.destructive, actionCallback: {
-            print("Delete all data")
-        })
-        return [simpleAction, destructiveAction]
-    }),
-
-    QSSelect(label: "How fast?", key: "speed",
-             options:QSEnumSettingsOptions<Speed>(defaultValue: .fastest)),
-    
-    QSToggle(label: "Should I?", key: "general.shouldi", defaultValue: true),
-    
-    QSGroup(title: "Extra", children: [
-        QSToggle(label: "Foo", key: "extra.foo", defaultValue: false),
-        QSToggle(label: "Bar", key: "extra.bar", defaultValue: true),
-        QSText(label: "Baz", key: "extra.baz", defaultValue: "TomTom"),
-        
-        QSGroup(title: "SubGroup", children: [
-            QSToggle(label: "SubFoo", key: "extra.subfoo", defaultValue: false),
-            QSGroup(title: "Text Fields", children: [
-                QSText(label: "Password", key: "extra.password", placeholder: "Enter password", type: .password),
-                QSText(label: "Email", key: "extra.email", placeholder: "Work email address", type: .email),
-                QSText(label: "Phone", key: "extra.phone", defaultValue: nil, type: .phone),
-                QSText(label: "URL", key: "extra.url", defaultValue: nil, type: .url),
-                QSText(label: "Decimal", key: "extra.decimal", defaultValue: nil, type: .decimal),
-                QSText(label: "Name", key: "extra.name", defaultValue: nil, type: .name),
-                QSText(label: "Int", key: "extra.int", defaultValue: nil, type: .int)
-            ])
-            ], footer: "This is a subgroup showing how the definition is recursive")
-    ])
-]
-
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-
+    lazy var settingsVC: UINavigationController = {
         let dataStore = UserDefaults.standard
         let root = QSGroup(title: "Settings Example", children: settings,
                            footer: "Made with a moderate amount of love by a developer who just wants to get stuff done. This library can be used freely without credit.")
         root.initialize(dataStore)
         let vc = QSSettingsViewController(root: root, delegate: self, dataStore: dataStore)
         let nav = UINavigationController(rootViewController: vc)
-        window?.rootViewController = nav
+        return nav
+    }()
+
+    lazy var signIn: UINavigationController = {
+        let vc = SignInViewController()
+        let nav = UINavigationController(rootViewController: vc)
+        return nav
+    }()
+
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+
+        let tab = UITabBarController()
+
+        tab.viewControllers = [settingsVC, signIn]
+
+        window?.rootViewController = tab
         
         return true
     }
