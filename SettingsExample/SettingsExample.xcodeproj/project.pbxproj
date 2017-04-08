@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		634820441E99292A00F85C68 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634820431E99292A00F85C68 /* Helpers.swift */; };
 		63B336D91DC6496900A2421E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B336D81DC6496900A2421E /* AppDelegate.swift */; };
 		63B336E01DC6496A00A2421E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63B336DF1DC6496A00A2421E /* Assets.xcassets */; };
 		63B336E31DC6496A00A2421E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63B336E11DC6496A00A2421E /* LaunchScreen.storyboard */; };
@@ -79,6 +80,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		634820431E99292A00F85C68 /* Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		63B336D51DC6496900A2421E /* SettingsExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SettingsExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		63B336D81DC6496900A2421E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		63B336DF1DC6496A00A2421E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 		63C327221DC8033D001E5542 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				634820431E99292A00F85C68 /* Helpers.swift */,
 				63C327231DC8035A001E5542 /* UIView+Extensions.swift */,
 			);
 			name = Extensions;
@@ -473,6 +476,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				63B3372A1DC649E700A2421E /* QSSettingsViewController.swift in Sources */,
+				634820441E99292A00F85C68 /* Helpers.swift in Sources */,
 				63B3372E1DC64A4600A2421E /* QSSettingsOptionsViewController.swift in Sources */,
 				63C327241DC8035A001E5542 /* UIView+Extensions.swift in Sources */,
 				63B3372C1DC649FD00A2421E /* QSModel.swift in Sources */,

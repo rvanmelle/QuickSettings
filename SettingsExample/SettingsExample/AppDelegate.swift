@@ -9,15 +9,29 @@
 import UIKit
 import QuickSettings
 
-enum Dogs : String {
-    case Lady
-    case Tramp
+enum Dogs: String, QSDescriptionEnum {
+    case lady
+    case tramp
+
+    var description: String? {
+        switch self {
+        case .lady: return "He/she is dignified and proper."
+        case .tramp: return "He/she is sassy and engaging."
+        }
+    }
 }
 
-enum Speed : String {
-    case Fast
-    case Faster
-    case Fastest
+enum Speed: String, QSDescriptionEnum {
+    case fast
+    case faster
+    case fastest
+    var description: String? {
+        switch self {
+        case .fastest: return "Faster than faster which is faster than fast, but *not* blistering."
+        default: return nil
+        }
+
+    }
 }
 
 let settings : [QSSettable] = [
@@ -25,14 +39,14 @@ let settings : [QSSettable] = [
         QSToggle(label:"Foo", key:"general.foo", defaultValue:true),
         QSInfo(label: "Bar Info", text: "this is what bar is"),
         QSSelect(label:"Bar2", key:"general.bar2",
-                 options:QSEnumSettingsOptions<Dogs>(defaultValue:.Lady)),
+                 options:QSEnumSettingsOptions<Dogs>(defaultValue:.lady)),
         QSText(label:"Baz", key:"general.baz", defaultValue:"Saskatoon"),
     ], footer:"This is a great section for adding lots of random settings that are not really necessary."),
     
     QSText(label:"Info", key:"general.info", defaultValue:"Swing"),
     
     QSSelect(label:"How fast?", key:"speed",
-             options:QSEnumSettingsOptions<Speed>(defaultValue:.Fastest)),
+             options:QSEnumSettingsOptions<Speed>(defaultValue:.fastest)),
     
     QSToggle(label:"Should I?", key:"general.shouldi", defaultValue:true),
     
@@ -101,7 +115,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension AppDelegate : QSSettingsViewControllerDelegate {
-    func settingsViewController(vc: QSSettingsViewController, didUpdateSetting id: String) {
+    func settingsViewController(settingsVc vc: QSSettingsViewController, didUpdateSetting id: String) {
         
     }
 }

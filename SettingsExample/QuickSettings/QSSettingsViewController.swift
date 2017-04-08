@@ -291,6 +291,7 @@ extension QSSettingsViewController {
         let options = setting.options.options
         let valueToDisplay = options[index]
         cell.textLabel?.text = valueToDisplay
+        cell.detailTextLabel?.text = setting.options.description(for: valueToDisplay)
         let currentValue = setting.value(from: defaultsStore)
         cell.accessoryType = (valueToDisplay == currentValue) ? .checkmark : .none
     }
