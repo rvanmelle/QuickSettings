@@ -186,6 +186,7 @@ public struct QSText: QSSettable {
     let key: String
     let defaultValue: String?
     let type: QSTextSettingType
+    let placeholder: String?
 
     /**
      Handy function to create a Text setting
@@ -194,11 +195,12 @@ public struct QSText: QSSettable {
      - parameter defaultValue: value to be used if none has been set
      - returns: a Setting of type QSText
      */
-    public init(label: String, key: String, defaultValue: String?, type: QSTextSettingType = .text) {
+    public init(label: String, key: String, defaultValue: String? = nil, placeholder: String? = nil, type: QSTextSettingType = .text) {
         self.label = label
         self.key = key
         self.defaultValue = defaultValue
         self.type = type
+        self.placeholder = placeholder
     }
 
     internal func value(from dataSource: QSSettingsDataSource) -> String? {

@@ -243,6 +243,7 @@ extension QSSettingsViewController {
         cell.textLabel?.text = setting.label
         cell.field.restorationIdentifier = setting.key
         cell.field.delegate = self
+        cell.field.placeholder = setting.placeholder
         cell.field.text = setting.value(from: defaultsStore)
         cell.textType = setting.type
         cell.field.addTarget(self, action: #selector(textValueChanged(theField:)), for: UIControlEvents.editingDidEnd)
