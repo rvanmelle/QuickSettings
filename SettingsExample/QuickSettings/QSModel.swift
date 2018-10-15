@@ -29,7 +29,7 @@ public protocol QSDescriptionEnum: Hashable {
  SettingsOptions. This allows a string enumeration to be easily used to display
  a set of options to the user.
 */
-public class QSEnumSettingsOptions<T: Hashable> : QSSettingsOptions where T: RawRepresentable, T: QSDescriptionEnum, T.RawValue == String {
+public class QSEnumSettingsOptions<T> : QSSettingsOptions where T: RawRepresentable, T: QSDescriptionEnum, T.RawValue == String {
 
     public typealias Option = T
 

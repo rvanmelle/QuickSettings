@@ -116,7 +116,7 @@ public class QSSettingsViewController: QSSettingsBaseViewController {
         }
 
         if let footerView = tableView.tableFooterView {
-            let height = footerView.systemLayoutSizeFitting(UILayoutFittingCompressedSize).height
+            let height = footerView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
             var footerFrame = footerView.frame
 
             if height != footerFrame.size.height {
@@ -246,7 +246,7 @@ extension QSSettingsViewController {
         cell.field.placeholder = setting.placeholder
         cell.field.text = setting.value(from: defaultsStore)
         cell.textType = setting.type
-        cell.field.addTarget(self, action: #selector(textValueChanged(theField:)), for: UIControlEvents.editingDidEnd)
+        cell.field.addTarget(self, action: #selector(textValueChanged(theField:)), for: UIControl.Event.editingDidEnd)
     }
 
     private func configureToggleCell(cell: QSSettingsTableCell, setting: QSToggle) {

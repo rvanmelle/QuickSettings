@@ -10,8 +10,8 @@ import Foundation
 
 internal extension UIFont {
 
-    func withTraits(_ traits: UIFontDescriptorSymbolicTraits...) -> UIFont {
-        guard let descriptor = self.fontDescriptor.withSymbolicTraits(UIFontDescriptorSymbolicTraits(traits)) else { fatalError() }
+    func withTraits(_ traits: UIFontDescriptor.SymbolicTraits...) -> UIFont {
+        guard let descriptor = self.fontDescriptor.withSymbolicTraits(UIFontDescriptor.SymbolicTraits(traits)) else { fatalError() }
         return UIFont(descriptor: descriptor, size: 0)
     }
 

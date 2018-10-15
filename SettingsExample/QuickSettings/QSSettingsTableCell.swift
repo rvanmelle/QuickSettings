@@ -10,7 +10,7 @@ import Foundation
 
 class QSSettingsTableCell: UITableViewCell {
 
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
     }
 
@@ -43,7 +43,7 @@ class QSSettingsTableCell: UITableViewCell {
 }
 
 class QSSettingsActionTableCell: UITableViewCell {
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         textLabel?.textAlignment = .center
     }
@@ -90,7 +90,7 @@ class QSSettingsTextTableCell: UITableViewCell {
         }
     }
 
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
         field.translatesAutoresizingMaskIntoConstraints = false
         field.textAlignment = .right

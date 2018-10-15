@@ -18,8 +18,8 @@ internal extension UIView {
 
     // MARK: - Auto Layout
 
-    @discardableResult func pinItem(_ item: AnyObject, attribute: NSLayoutAttribute,
-                                    to toItem: AnyObject, toAttribute: NSLayoutAttribute?=nil,
+    @discardableResult func pinItem(_ item: AnyObject, attribute: NSLayoutConstraint.Attribute,
+                                    to toItem: AnyObject, toAttribute: NSLayoutConstraint.Attribute?=nil,
                                     withOffset offset: CGFloat=0, andScale scale: CGFloat=1, priority: UILayoutPriority?=nil) -> NSLayoutConstraint {
         let constraint = NSLayoutConstraint(item: item, attribute: attribute, relatedBy: .equal,
                                             toItem: toItem, attribute: toAttribute ?? attribute,

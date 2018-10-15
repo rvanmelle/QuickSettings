@@ -23,13 +23,13 @@ extension UIViewController {
     func embedFillingChildVC(_ childVC: UIViewController) {
         guard let containerView = self.view else { return }
 
-        self.addChildViewController(childVC)
+        self.addChild(childVC)
         containerView.addSubview(childVC.view)
 
         //childVC.view.translatesAutoresizingMaskIntoConstraints = false
         //containerView.pinItemFillHorizontally(childVC.view)
         //containerView.pinItemFillVertically(childVC.view)
-        childVC.didMove(toParentViewController: self)
+        childVC.didMove(toParent: self)
         containerView.layoutIfNeeded()
     }
 }
@@ -54,7 +54,7 @@ class SignInViewController: UIViewController {
         return vc
     }()
 
-    func loginAction() {
+    @objc func loginAction() {
         view.endEditing(true)
         guard let email = email, let _ = password else {
             simpleAlert("Invalid Input", message: "You must provide both an email and a password to continue.")
