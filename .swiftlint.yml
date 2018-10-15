@@ -1,0 +1,81 @@
+# https://github.com/instacart/style-guides/blob/master/Swift.md
+opt_in_rules:
+  - closure_end_indentation
+  - closure_spacing
+  - empty_count
+  - explicit_init
+  - explicit_type_interface
+  - first_where
+  - implicit_return
+  - implicitly_unwrapped_optional
+  - joined_default_parameter
+  - multiline_parameters
+  - nimble_operator
+  - operator_usage_whitespace
+  - overridden_super_call
+  - private_over_fileprivate
+  - redundant_nil_coalescing
+  - single_test_class
+  - unneeded_parentheses_in_closure_argument
+
+disabled_rules:
+  - trailing_comma
+  - switch_case_alignment
+  - identifier_name
+
+file_length: 450
+swiftlint_version: 0.27.0
+
+cyclomatic_complexity:
+  ignores_case_statements: true
+
+explicit_type_interface:
+  excluded:
+    - local
+
+identifier_name:
+  excluded:
+    - id
+    - x
+    - y
+    - z
+
+custom_rules:
+  late_force_unwrapping:
+    included: ".*.swift"
+    regex: '\(\S+\?\.\S+\)!'
+    name: "Late Force Unwrapping"
+    message: "Don't use ? first to force unwrap later – directly unwrap within the parentheses."
+    severity: warning
+  vertical_whitespace_opening_braces:
+    included: ".*.swift"
+    regex: '[{(\[][ \t]*\n[ \t]*\n'
+    name: "Vertical Whitespace after Opening Braces"
+    message: "Don't include vertical whitespace (empty line) after opening braces."
+    severity: warning
+  vertical_whitespace_closing_braces:
+    included: ".*.swift"
+    regex: '\n[ \t]*\n[ \t]*[)}\]]'
+    name: "Vertical Whitespace before Closing Braces"
+    message: "Don't include vertical whitespace (empty line) before closing braces."
+    severity: warning
+  whitespace_comment_start:
+    included: ".*.swift"
+    regex: '[^:#][^:#]\/\/[^\s\/]'
+    name: "Whitespace Comment Start"
+    message: "A comment should always start with a whitespace."
+    severity: warning
+  hardcoded_domain:
+    included: "InstaShopper"
+    regex: '(instacart|instashopper)\w*?\.\w+'
+    match_kinds:
+      - string
+    name: "Hardcoded Instacart domain"
+    message: "Use environment variables instead for domains and identifiers (see README)."
+    severity: warning
+
+excluded:
+  - Vendor
+  - Pods
+  - Tests
+  - Carthage

@@ -1,0 +1,25 @@
+version: 2
+jobs:
+  build:
+    macos:
+      xcode: "10.0.0"
+    shell: /bin/bash --login -eo pipefail
+    environment:
+      LC_ALL: en_US.UTF-8
+      LANG: en_US.UTF-8
+
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: xcodebuild -scheme QuickSettings
+      - run:
+          name: install danger
+          command: |
+              npm install -g danger
+              rm /usr/local/bin/danger
+              brew install danger/tap/danger-swift
+      - run:
+          name: danger swift
+          command: DEBUG="*" danger process danger-swift
+

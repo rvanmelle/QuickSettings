@@ -1,0 +1,7 @@
+functions:
+  error_threshold: 200
+  warning_threshold: 100
+
+expressions:
+  error_threshold: 100
+  warning_threshold: 50
